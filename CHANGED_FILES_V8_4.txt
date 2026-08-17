@@ -1,0 +1,25 @@
+Smart Recon V8.4 passive Shodan update
+
+New:
+- .env
+- .env.example
+- .gitignore
+- shodan_dorks.json
+- README_V8_4_SHODAN_PASSIVE.md
+- run-max-v8.4-shodan.cmd
+- smart_recon/env_utils.py
+- smart_recon/shodan_passive.py
+- tests/test_shodan_passive_v84.py
+
+Updated:
+- smart_recon/__init__.py
+- smart_recon/config.py
+- smart_recon/cli.py
+- smart_recon/pipeline.py
+- smart_recon/reporting.py
+
+Unchanged V8.3 capabilities retained:
+- CDN/Wappalyzer/WAF evidence
+- optional WAFW00F
+- controlled Naabu TCP CONNECT scan
+- light Nmap validation of Naabu-confirmed ports

@@ -1,0 +1,16 @@
+V8.5 new/updated files
+
+NEW
+- smart_recon/recursive_recon.py
+- tests/test_recursive_recon_v85.py
+- README_V8_5_RECURSIVE_RECON.md
+- run-max-v8.5-recursive.cmd
+
+UPDATED
+- smart_recon/shodan_passive.py
+- smart_recon/commands.py
+- smart_recon/pipeline.py
+- smart_recon/reporting.py
+- smart_recon/cli.py
+- smart_recon/config.py
+- smart_recon/__init__.py

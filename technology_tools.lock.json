@@ -1,0 +1,34 @@
+{
+  "schema_version": "9.2.0",
+  "tools": {
+    "httpx": {
+      "version_reviewed": "1.9.0",
+      "image": "projectdiscovery/httpx:latest",
+      "role": "existing fast Wappalyzer-dataset evidence from reconnaissance"
+    },
+    "whatweb": {
+      "version": "0.6.4",
+      "image": "0xcrawller/whatweb:0.6.4",
+      "source": "urbanadventurer/WhatWeb",
+      "role": "parallel version-aware web technology plugins"
+    },
+    "wappalyzer_next": {
+      "version": "2.0.0",
+      "image": "0xcrawller/wappalyzer-next:2.0.0",
+      "source": "s0md3v/wappalyzer-next",
+      "role": "Chromium and official-extension dynamic web technology detection"
+    },
+    "retirejs": {
+      "version": "5.4.3",
+      "image": "0xcrawller/retirejs:5.4.3",
+      "source": "RetireJS/retire.js",
+      "role": "client-side JavaScript component, version, vulnerability metadata, and SBOM-capable evidence"
+    },
+    "zgrab2": {
+      "version_reviewed": "1.0.0",
+      "image": "ghcr.io/zmap/zgrab2:latest",
+      "source": "zmap/zgrab2",
+      "role": "official protocol-aware database, cache, queue, and network-service handshakes"
+    }
+  }
+}

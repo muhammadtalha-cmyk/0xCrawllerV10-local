@@ -1,0 +1,686 @@
+Folder PATH listing
+Volume serial number is 0000017C 32E2:9F8C
+E:\CRAWLLERPHASE2\0XCRAWLLERV2\SMART_SUBDOMAIN_PIPELINE_V8_MODULAR\RECON_RUNS\HIAPP.PK-20260730-122328
+¦   all_candidates.txt
+¦   autotune.json
+¦   base_wordlist.txt
+¦   browser_discovered_hosts.txt
+¦   browser_discovered_urls.txt
+¦   browser_observed_hosts_all.txt
+¦   browser_validated_subdomains.txt
+¦   bulk_candidates.txt
+¦   candidate_manifest.csv
+¦   candidate_manifest.jsonl
+¦   canonical_target.json
+¦   carried_forward_unvalidated.json
+¦   command_manifest.json
+¦   confirmed_subdomains.csv
+¦   confirmed_subdomains.json
+¦   confirmed_subdomains.txt
+¦   custom_wordlist.txt
+¦   dnsx_browser_discovered.jsonl
+¦   dnsx_chunk_manifest.json
+¦   dnsx_gobuster_new.jsonl
+¦   dnsx_priority.jsonl
+¦   edge_detection_summary.json
+¦   endpoint_classification.json
+¦   external_references.txt
+¦   extracted_keywords.txt
+¦   final_report.md
+¦   gobuster_base.txt
+¦   gobuster_custom.txt
+¦   gobuster_new_hosts_to_validate.txt
+¦   httpx_browser_discovered.jsonl
+¦   httpx_probe.jsonl
+¦   httpx_root_probe.jsonl
+¦   httpx_screenshots.jsonl
+¦   http_review_classification.csv
+¦   http_review_classification.json
+¦   internal_ip_leaks.json
+¦   katana_urls.txt
+¦   keyword_evidence.json
+¦   live_urls_for_screenshot.txt
+¦   naabu_ports.csv
+¦   naabu_ports.json
+¦   nmap_services.csv
+¦   nmap_services.json
+¦   openapi_candidates.txt
+¦   port_candidate_reconciliation.csv
+¦   port_candidate_reconciliation.json
+¦   port_scan_summary.json
+¦   port_scan_targets.txt
+¦   port_scan_target_manifest.csv
+¦   port_scan_target_manifest.json
+¦   previous_validated_hosts.txt
+¦   priority_candidates.txt
+¦   recon_clusters.json
+¦   recon_mindmap.mmd
+¦   recon_topology.json
+¦   recursive_hosts_by_level.json
+¦   recursive_recon_summary.json
+¦   recursive_urls_all.txt
+¦   recursive_wildcard_suspected.json
+¦   rejected_keywords.json
+¦   root_probe_input.txt
+¦   screenshot_status.json
+¦   shodan_api_info.json
+¦   shodan_assets.json
+¦   shodan_credit_ledger.json
+¦   shodan_discovered_hosts.txt
+¦   shodan_dns_domain.jsonl
+¦   shodan_dork_counts.json
+¦   shodan_dork_plan.json
+¦   shodan_host_lookups.jsonl
+¦   shodan_host_no_data.jsonl
+¦   shodan_ports.csv
+¦   shodan_search_filters.json
+¦   shodan_search_results.jsonl
+¦   shodan_services.jsonl
+¦   shodan_summary.json
+¦   shodan_vulnerabilities.json
+¦   subdomains_all_raw.txt
+¦   subfinder_subdomains.txt
+¦   summary.json
+¦   tool_versions.json
+¦   unconfirmed_tool_found_subdomains.txt
+¦   validated_dns_hosts.csv
+¦   validated_dns_hosts.json
+¦   validated_dns_hosts.txt
+¦   wafw00f.json
+¦   waf_detection.csv
+¦   waf_detection.json
+¦   waf_targets.txt
+¦   wildcard_check.json
+¦   wildcard_suspected_hosts.json
+¦   wildcard_tests.jsonl
+¦   wildcard_tests.txt
+¦   
++---bbot_home
+¦   +---cache
+¦   ¦   ¦   -650804506
+¦   ¦   ¦   25152d64f6205b681a2b170969063ff7030fd01c
+¦   ¦   ¦   be39bf61f9bdae11ebaccd91117bb7d4e91a096e
+¦   ¦   ¦   module_preload_cache
+¦   ¦   ¦   
+¦   ¦   +---depsinstaller
+¦   ¦       ¦   minimal_git.config
+¦   ¦       ¦   setup_status.json
+¦   ¦       ¦   
+¦   ¦       +---command_status
+¦   ¦       +---playbook_47a8caaddcc9807f9b20cd4550ebefcab85da868
+¦   ¦       ¦   +---artifacts
+¦   ¦       ¦   ¦   +---257d624e-e4a4-4731-88d3-9e72b0a9b013
+¦   ¦       ¦   ¦       ¦   command
+¦   ¦       ¦   ¦       ¦   rc
+¦   ¦       ¦   ¦       ¦   status
+¦   ¦       ¦   ¦       ¦   stderr
+¦   ¦       ¦   ¦       ¦   stdout
+¦   ¦       ¦   ¦       ¦   
+¦   ¦       ¦   ¦       +---fact_cache
+¦   ¦       ¦   ¦       ¦       s1_localhost
+¦   ¦       ¦   ¦       ¦       
+¦   ¦       ¦   ¦       +---job_events
+¦   ¦       ¦   +---inventory
+¦   ¦       ¦   ¦       hosts.json
+¦   ¦       ¦   ¦       
+¦   ¦       ¦   +---project
+¦   ¦       ¦           main.json
+¦   ¦       ¦           
+¦   ¦       +---playbook_d2c3499d61127d499b21e14035721ceeb31690f3
+¦   ¦           +---artifacts
+¦   ¦           ¦   +---9fcf1e83-c89f-41ee-9c45-5d57b858f593
+¦   ¦           ¦       ¦   command
+¦   ¦           ¦       ¦   rc
+¦   ¦           ¦       ¦   status
+¦   ¦           ¦       ¦   stderr
+¦   ¦           ¦       ¦   stdout
+¦   ¦           ¦       ¦   
+¦   ¦           ¦       +---fact_cache
+¦   ¦           ¦       ¦       s1_localhost
+¦   ¦           ¦       ¦       
+¦   ¦           ¦       +---job_events
+¦   ¦           +---inventory
+¦   ¦           ¦       hosts.json
+¦   ¦           ¦       
+¦   ¦           +---project
+¦   ¦                   main.json
+¦   ¦                   
+¦   +---lib
+¦   +---logs
+¦   ¦       bbot.debug.log
+¦   ¦       bbot.log
+¦   ¦       
+¦   +---scans
+¦   ¦   +---pretentious_danny
+¦   ¦           asns-table-20260730_0730_53.txt
+¦   ¦           debug.log
+¦   ¦           error.log
+¦   ¦           output.csv
+¦   ¦           output.json
+¦   ¦           output.txt
+¦   ¦           preset.yml
+¦   ¦           scan-stats-table-20260730_0730_53.txt
+¦   ¦           scan.log
+¦   ¦           subdomains.txt
+¦   ¦           wordcloud.tsv
+¦   ¦           
+¦   +---temp
+¦   ¦   +---massdns
+¦   ¦       ¦   .gitignore
+¦   ¦       ¦   CMakeLists.txt
+¦   ¦       ¦   Dockerfile
+¦   ¦       ¦   LICENSE
+¦   ¦       ¦   Makefile
+¦   ¦       ¦   README.md
+¦   ¦       ¦   
+¦   ¦       +---.git
+¦   ¦       ¦   ¦   config
+¦   ¦       ¦   ¦   description
+¦   ¦       ¦   ¦   HEAD
+¦   ¦       ¦   ¦   index
+¦   ¦       ¦   ¦   ORIG_HEAD
+¦   ¦       ¦   ¦   packed-refs
+¦   ¦       ¦   ¦   
+¦   ¦       ¦   +---branches
+¦   ¦       ¦   +---hooks
+¦   ¦       ¦   ¦       applypatch-msg.sample
+¦   ¦       ¦   ¦       commit-msg.sample
+¦   ¦       ¦   ¦       fsmonitor-watchman.sample
+¦   ¦       ¦   ¦       post-update.sample
+¦   ¦       ¦   ¦       pre-applypatch.sample
+¦   ¦       ¦   ¦       pre-commit.sample
+¦   ¦       ¦   ¦       pre-merge-commit.sample
+¦   ¦       ¦   ¦       pre-push.sample
+¦   ¦       ¦   ¦       pre-rebase.sample
+¦   ¦       ¦   ¦       pre-receive.sample
+¦   ¦       ¦   ¦       prepare-commit-msg.sample
+¦   ¦       ¦   ¦       push-to-checkout.sample
+¦   ¦       ¦   ¦       sendemail-validate.sample
+¦   ¦       ¦   ¦       update.sample
+¦   ¦       ¦   ¦       
+¦   ¦       ¦   +---info
+¦   ¦       ¦   ¦       exclude
+¦   ¦       ¦   ¦       
+¦   ¦       ¦   +---logs
+¦   ¦       ¦   ¦   ¦   HEAD
+¦   ¦       ¦   ¦   ¦   
+¦   ¦       ¦   ¦   +---refs
+¦   ¦       ¦   ¦       +---heads
+¦   ¦       ¦   ¦       ¦       master
+¦   ¦       ¦   ¦       ¦       
+¦   ¦       ¦   ¦       +---remotes
+¦   ¦       ¦   ¦           +---origin
+¦   ¦       ¦   ¦                   HEAD
+¦   ¦       ¦   ¦                   
+¦   ¦       ¦   +---objects
+¦   ¦       ¦   ¦   +---info
+¦   ¦       ¦   ¦   +---pack
+¦   ¦       ¦   ¦           pack-5b5187cf1ffeaef2db8291b6fd074e8dbd835970.idx
+¦   ¦       ¦   ¦           pack-5b5187cf1ffeaef2db8291b6fd074e8dbd835970.pack
+¦   ¦       ¦   ¦           pack-5b5187cf1ffeaef2db8291b6fd074e8dbd835970.rev
+¦   ¦       ¦   ¦           
+¦   ¦       ¦   +---refs
+¦   ¦       ¦       +---heads
+¦   ¦       ¦       ¦       master
+¦   ¦       ¦       ¦       
+¦   ¦       ¦       +---remotes
+¦   ¦       ¦       ¦   +---origin
+¦   ¦       ¦       ¦           HEAD
+¦   ¦       ¦       ¦           
+¦   ¦       ¦       +---tags
+¦   ¦       ¦               v0.2
+¦   ¦       ¦               v0.3
+¦   ¦       ¦               v1.0.0
+¦   ¦       ¦               v1.1.0
+¦   ¦       ¦               
+¦   ¦       +---.github
+¦   ¦       ¦   +---workflows
+¦   ¦       ¦           main.yml
+¦   ¦       ¦           
+¦   ¦       +---bin
+¦   ¦       ¦       massdns
+¦   ¦       ¦       
+¦   ¦       +---doc
+¦   ¦       ¦       massdns.1
+¦   ¦       ¦       
+¦   ¦       +---lists
+¦   ¦       ¦       names.txt
+¦   ¦       ¦       names_small.txt
+¦   ¦       ¦       resolvers.txt
+¦   ¦       ¦       
+¦   ¦       +---scripts
+¦   ¦       ¦       auth-addrs.sh
+¦   ¦       ¦       censys-extract.py
+¦   ¦       ¦       ct.py
+¦   ¦       ¦       dnsparse.py
+¦   ¦       ¦       get-resolvers.py
+¦   ¦       ¦       get-resolvers.sh
+¦   ¦       ¦       massdnsA.jq
+¦   ¦       ¦       massdnsAAAA.jq
+¦   ¦       ¦       ptr.py
+¦   ¦       ¦       recon.py
+¦   ¦       ¦       requirements.txt
+¦   ¦       ¦       subbrute.py
+¦   ¦       ¦       
+¦   ¦       +---src
+¦   ¦       ¦       auto_concurrency.h
+¦   ¦       ¦       buffers.h
+¦   ¦       ¦       cmd.h
+¦   ¦       ¦       dns.h
+¦   ¦       ¦       flow.h
+¦   ¦       ¦       hashmap.h
+¦   ¦       ¦       list.h
+¦   ¦       ¦       main.c
+¦   ¦       ¦       massdns.h
+¦   ¦       ¦       net.h
+¦   ¦       ¦       random.h
+¦   ¦       ¦       security.h
+¦   ¦       ¦       string.h
+¦   ¦       ¦       tcp.h
+¦   ¦       ¦       timed_ring.h
+¦   ¦       ¦       
+¦   ¦       +---tests
+¦   ¦           ¦   run-tests.sh
+¦   ¦           ¦   
+¦   ¦           +---ignore-code-test-json
+¦   ¦           ¦       google-dns.txt
+¦   ¦           ¦       names.txt
+¦   ¦           ¦       run.sh
+¦   ¦           ¦       
+¦   ¦           +---multi-lookup-A-ipv4-dedicated-resolver
+¦   ¦           ¦       expected
+¦   ¦           ¦       google-dns.txt
+¦   ¦           ¦       names.txt
+¦   ¦           ¦       run.sh
+¦   ¦           ¦       
+¦   ¦           +---single-lookup-A-ipv4-dedicated-resolver
+¦   ¦           ¦       expected
+¦   ¦           ¦       google-dns.txt
+¦   ¦           ¦       names.txt
+¦   ¦           ¦       run.sh
+¦   ¦           ¦       
+¦   ¦           +---single-lookup-A-ipv4-resolver
+¦   ¦           ¦       expected
+¦   ¦           ¦       google-dns.txt
+¦   ¦           ¦       names.txt
+¦   ¦           ¦       run.sh
+¦   ¦           ¦       
+¦   ¦           +---single-lookup-A-ipv4-resolver-pipe
+¦   ¦           ¦       expected
+¦   ¦           ¦       google-dns.txt
+¦   ¦           ¦       names.txt
+¦   ¦           ¦       run.sh
+¦   ¦           ¦       
+¦   ¦           +---single-lookup-A-ipv6-resolver
+¦   ¦                   expected
+¦   ¦                   google-dns.txt
+¦   ¦                   names.txt
+¦   ¦                   run.sh
+¦   ¦                   
+¦   +---tools
+¦           massdns
+¦           sudo_askpass.py
+¦           
++---dnsx_chunks
+¦   +---inputs
+¦   ¦       chunk_0001.txt
+¦   ¦       
+¦   +---results
+¦           chunk_0001.jsonl
+¦           
++---httpx_screenshots
+¦   +---response
+¦   ¦   ¦   index.txt
+¦   ¦   ¦   
+¦   ¦   +---adminbackend.hiapp.pk
+¦   ¦   ¦       cc13a4caefef2b5eadbbffd1db121ff188e7635a.txt
+¦   ¦   ¦       
+¦   ¦   +---api-slac.hiapp.pk
+¦   ¦   ¦       b309f82e10b2441541691128f7570cacade22325.txt
+¦   ¦   ¦       
+¦   ¦   +---backend.hiapp.pk
+¦   ¦   ¦       b5ebe4fa6b94767b77be9ff7c99a8a80ea754b25.txt
+¦   ¦   ¦       
+¦   ¦   +---call.hiapp.pk
+¦   ¦   ¦       2e2d82cc504e2f0800e031286f707a07a89c154c.txt
+¦   ¦   ¦       
+¦   ¦   +---chat.hiapp.pk
+¦   ¦   ¦       151e56460b59369ee099df84f06446419c22b1bb.txt
+¦   ¦   ¦       
+¦   ¦   +---email.otp.hiapp.pk
+¦   ¦   ¦       bbfdb60d52ec356d1f6efafb1c15d668ab2ae379.txt
+¦   ¦   ¦       
+¦   ¦   +---file.hiapp.pk
+¦   ¦   ¦       9d39ce86a78350e5309d112151610666fc2d99ce.txt
+¦   ¦   ¦       
+¦   ¦   +---hiapp.pk
+¦   ¦   ¦       fe2203b4632f8e1d26911ff9ad065ee5bfefff57.txt
+¦   ¦   ¦       
+¦   ¦   +---mail.hiapp.pk
+¦   ¦   ¦       e8ba4f8705d3dc0414b8c8e83c7d2a2832576849.txt
+¦   ¦   ¦       
+¦   ¦   +---reg.hiapp.pk
+¦   ¦   ¦       41c2cd4d855561258aac85dff7f78b103fbd5f53.txt
+¦   ¦   ¦       
+¦   ¦   +---slac-admin.hiapp.pk
+¦   ¦   ¦       308cc4e16f5c47b8445f5825238a0dbf92adadb7.txt
+¦   ¦   ¦       
+¦   ¦   +---slac.hiapp.pk
+¦   ¦   ¦       b29bef61f2a4fa7744ba6fffbfda7bf5c6194ce1.txt
+¦   ¦   ¦       
+¦   ¦   +---sync.hiapp.pk
+¦   ¦   ¦       7e1d87abd6e047e7110b310e1e86706b7118e2bc.txt
+¦   ¦   ¦       
+¦   ¦   +---web.hiapp.pk
+¦   ¦   ¦       a075a982b2680d23f39a941a9f65a3f10fcf3d0f.txt
+¦   ¦   ¦       
+¦   ¦   +---xmpp.hiapp.pk
+¦   ¦           521d2de5ff30cdc7fc3a71132cfb5062d5cd85af.txt
+¦   ¦           
+¦   +---screenshot
+¦       ¦   index_screenshot.txt
+¦       ¦   screenshot.html
+¦       ¦   
+¦       +---adminbackend.hiapp.pk
+¦       ¦       cc13a4caefef2b5eadbbffd1db121ff188e7635a.png
+¦       ¦       
+¦       +---api-slac.hiapp.pk
+¦       ¦       b309f82e10b2441541691128f7570cacade22325.png
+¦       ¦       
+¦       +---backend.hiapp.pk
+¦       ¦       b5ebe4fa6b94767b77be9ff7c99a8a80ea754b25.png
+¦       ¦       
+¦       +---call.hiapp.pk
+¦       ¦       2e2d82cc504e2f0800e031286f707a07a89c154c.png
+¦       ¦       
+¦       +---chat.hiapp.pk
+¦       ¦       151e56460b59369ee099df84f06446419c22b1bb.png
+¦       ¦       
+¦       +---email.otp.hiapp.pk
+¦       ¦       bbfdb60d52ec356d1f6efafb1c15d668ab2ae379.png
+¦       ¦       
+¦       +---file.hiapp.pk
+¦       ¦       9d39ce86a78350e5309d112151610666fc2d99ce.png
+¦       ¦       
+¦       +---hiapp.pk
+¦       ¦       fe2203b4632f8e1d26911ff9ad065ee5bfefff57.png
+¦       ¦       
+¦       +---mail.hiapp.pk
+¦       ¦       e8ba4f8705d3dc0414b8c8e83c7d2a2832576849.png
+¦       ¦       
+¦       +---reg.hiapp.pk
+¦       ¦       41c2cd4d855561258aac85dff7f78b103fbd5f53.png
+¦       ¦       
+¦       +---slac-admin.hiapp.pk
+¦       ¦       308cc4e16f5c47b8445f5825238a0dbf92adadb7.png
+¦       ¦       
+¦       +---slac.hiapp.pk
+¦       ¦       b29bef61f2a4fa7744ba6fffbfda7bf5c6194ce1.png
+¦       ¦       
+¦       +---sync.hiapp.pk
+¦       ¦       7e1d87abd6e047e7110b310e1e86706b7118e2bc.png
+¦       ¦       
+¦       +---web.hiapp.pk
+¦       ¦       a075a982b2680d23f39a941a9f65a3f10fcf3d0f.png
+¦       ¦       
+¦       +---xmpp.hiapp.pk
+¦               521d2de5ff30cdc7fc3a71132cfb5062d5cd85af.png
+¦               
++---normalization_v9
+¦       asset_conflicts.json
+¦       asset_inventory.csv
+¦       asset_inventory.json
+¦       asset_normalization_report.md
+¦       asset_relationships.json
+¦       asset_revalidation_queue.json
+¦       endpoint_inventory.csv
+¦       endpoint_inventory.json
+¦       normalization_summary.json
+¦       service_inventory.csv
+¦       service_inventory.json
+¦       testing_eligibility.json
+¦       
++---recursive
+¦   +---level_01
+¦       ¦   katana_adminbackend.hiapp.pk_31d3788d.txt
+¦       ¦   katana_api-slac-admin.hiapp.pk_6c5e1241.txt
+¦       ¦   katana_api-slac.hiapp.pk_f49a8a83.txt
+¦       ¦   katana_backend.hiapp.pk_e64e4f4b.txt
+¦       ¦   katana_call.hiapp.pk_7ee1b1d2.txt
+¦       ¦   katana_chat.hiapp.pk_5524ba0a.txt
+¦       ¦   katana_email.otp.hiapp.pk_1b653298.txt
+¦       ¦   katana_file.hiapp.pk_6908d9d2.txt
+¦       ¦   katana_mail.hiapp.pk_f48c9acf.txt
+¦       ¦   katana_reg.hiapp.pk_5959cb65.txt
+¦       ¦   katana_slac-admin.hiapp.pk_6fe4499a.txt
+¦       ¦   katana_slac.hiapp.pk_72604529.txt
+¦       ¦   katana_sync.hiapp.pk_49b8b896.txt
+¦       ¦   katana_web.hiapp.pk_98003fc6.txt
+¦       ¦   katana_xmpp.hiapp.pk_95f4435a.txt
+¦       ¦   screenshots.jsonl
+¦       ¦   screenshot_urls.txt
+¦       ¦   
+¦       +---screenshots
+¦           +---response
+¦           ¦   ¦   index.txt
+¦           ¦   ¦   
+¦           ¦   +---api-slac-admin.hiapp.pk
+¦           ¦           46829f3501fb3645bbe8b51487ad5f78769dd7f9.txt
+¦           ¦           
+¦           +---screenshot
+¦               ¦   index_screenshot.txt
+¦               ¦   screenshot.html
+¦               ¦   
+¦               +---api-slac-admin.hiapp.pk
+¦                       46829f3501fb3645bbe8b51487ad5f78769dd7f9.png
+¦                       
++---support
+¦   +---nmap_image
+¦   ¦       Dockerfile
+¦   ¦       
+¦   +---wafw00f_image
+¦           Dockerfile
+¦           
++---technology_enrichment_v9_2
+¦   ¦   asset_inventory_enriched.json
+¦   ¦   http_technology_evidence.json
+¦   ¦   javascript_components.json
+¦   ¦   service_fingerprints.csv
+¦   ¦   service_fingerprints.json
+¦   ¦   service_inventory_enriched.json
+¦   ¦   technology_conflicts.json
+¦   ¦   technology_enrichment_report.md
+¦   ¦   technology_enrichment_summary.json
+¦   ¦   technology_evidence.jsonl
+¦   ¦   technology_inventory.csv
+¦   ¦   technology_inventory.json
+¦   ¦   technology_revalidation_queue.json
+¦   ¦   technology_stack_map.mmd
+¦   ¦   technology_target_plan.json
+¦   ¦   technology_tool_status.json
+¦   ¦   wappalyzer_next_results.json
+¦   ¦   whatweb_results.json
+¦   ¦   zgrab2_service_results.json
+¦   ¦   
+¦   +---retirejs
+¦   ¦   ¦   js_fetch_manifest.json
+¦   ¦   ¦   
+¦   ¦   +---js_cache
+¦   ¦           call.hiapp.pk__3de4415dec5390478db1__main.js
+¦   ¦           call.hiapp.pk__408c7d3fb2c912d14889__main.js
+¦   ¦           chat.hiapp.pk__915e3196d2272f8795dd__main.js
+¦   ¦           chat.hiapp.pk__fa8c1f73da83178a088c__main.js
+¦   ¦           file.hiapp.pk__0de7bb071548d763163a__main.js
+¦   ¦           file.hiapp.pk__d15e00db852fa5bca4fc__main.js
+¦   ¦           hiapp.pk__0af4ab0bd61017ac11c1__page-e65e666130baf79e.js
+¦   ¦           hiapp.pk__10a088dd1a6bece8160f__5964-909c2aa918bcc589.js
+¦   ¦           hiapp.pk__4f1e4783c4c11070af05__page-5ec9513afe4f59fa.js
+¦   ¦           hiapp.pk__52e74338e728bdcfc252__polyfills-42372ed130431b0a.js
+¦   ¦           hiapp.pk__5aa7800e2b1e185b902e__main.js
+¦   ¦           hiapp.pk__6049a9d383b7c38c5b4e__e6f1ddf8c7e0375e.css.js
+¦   ¦           hiapp.pk__6472fa1a12c6eb676d11__9468c63d5d5149c4.css.js
+¦   ¦           hiapp.pk__6db9814968632f8c6494__page-1c485c16d52c99cf.js
+¦   ¦           hiapp.pk__7514eecf2dedbea1daa5__layout-db3883c35c8b125e.js
+¦   ¦           hiapp.pk__87d047ae0e3fb16e0ea6__6441-d380cc4ca7019d05.js
+¦   ¦           hiapp.pk__89f5c67509655f4c5e75__b496025c9cd768cc.css.js
+¦   ¦           hiapp.pk__8be3cf4c85026854f8db__2170a4aa-eb49983ef9e66789.js
+¦   ¦           hiapp.pk__92389edfa736062a3229__8e1d74a4-fd189d110704defc.js
+¦   ¦           hiapp.pk__996f01d8bb8ab514459e__41ade5dc-6217ca861f16b523.js
+¦   ¦           hiapp.pk__a87d2f2a33ec59839a51__main-app-5d8ad7069850b399.js
+¦   ¦           hiapp.pk__af3197b4ea4a2019b27e__8608-22abdc4347c4a6eb.js
+¦   ¦           hiapp.pk__bd950141049e4acd644f__1894-730bb732cf37bd83.js
+¦   ¦           hiapp.pk__bf22bac0dedb034d0e0d__4bd1b696-cc729d47eba2cee4.js
+¦   ¦           hiapp.pk__c80731b3709b5c8c98f4__ee6f56287b3de9c2.css.js
+¦   ¦           hiapp.pk__db0b8a45a34f269309dd__page-816f425c337c82e9.js
+¦   ¦           hiapp.pk__f00e40e8b61ab8467e5f__webpack-5c10cda23b47487d.js
+¦   ¦           hiapp.pk__f0f36b54e93e0b197b34__main.js
+¦   ¦           mail.hiapp.pk__03af1cda6de4ad2d9309__page-1c485c16d52c99cf.js
+¦   ¦           mail.hiapp.pk__0528f9b8233db9aceb76__layout-db3883c35c8b125e.js
+¦   ¦           mail.hiapp.pk__094d6024b3c1f07f458c__2170a4aa-eb49983ef9e66789.js
+¦   ¦           mail.hiapp.pk__104acc6c5489d62de1af__9468c63d5d5149c4.css.js
+¦   ¦           mail.hiapp.pk__2a1594c871fd91cd5be9__page-e65e666130baf79e.js
+¦   ¦           mail.hiapp.pk__3fec48b5d6190e51ab07__page-5ec9513afe4f59fa.js
+¦   ¦           mail.hiapp.pk__5680170dea1606b60217__ee6f56287b3de9c2.css.js
+¦   ¦           mail.hiapp.pk__6902dc8bafbcf5781f1d__e6f1ddf8c7e0375e.css.js
+¦   ¦           mail.hiapp.pk__71274108e98505764e1b__polyfills-42372ed130431b0a.js
+¦   ¦           mail.hiapp.pk__77360217047dc3e1e917__main.js
+¦   ¦           mail.hiapp.pk__77692f7ef781df02aec7__1894-730bb732cf37bd83.js
+¦   ¦           mail.hiapp.pk__814896ada2525ab62460__main-app-5d8ad7069850b399.js
+¦   ¦           mail.hiapp.pk__815fade4df979b222598__5964-909c2aa918bcc589.js
+¦   ¦           mail.hiapp.pk__8b42ee370cfb844784d5__6441-d380cc4ca7019d05.js
+¦   ¦           mail.hiapp.pk__8bd95b4367e8ee6e1e88__8608-22abdc4347c4a6eb.js
+¦   ¦           mail.hiapp.pk__aafbde48f4fb9283a124__webpack-5c10cda23b47487d.js
+¦   ¦           mail.hiapp.pk__c5b9ec988de4cfafb4ac__4bd1b696-cc729d47eba2cee4.js
+¦   ¦           mail.hiapp.pk__e19dffa824658c4d6a3f__8e1d74a4-fd189d110704defc.js
+¦   ¦           mail.hiapp.pk__ec7443a2cdeea7f7d32a__page-816f425c337c82e9.js
+¦   ¦           mail.hiapp.pk__f0db35b2b3f464dec475__b496025c9cd768cc.css.js
+¦   ¦           mail.hiapp.pk__f25e7c709bebd9c9f11f__main.js
+¦   ¦           mail.hiapp.pk__fda4655e5ee1185238d9__41ade5dc-6217ca861f16b523.js
+¦   ¦           reg.hiapp.pk__0366e31408f0add0e135__main.js
+¦   ¦           reg.hiapp.pk__baa5c5dd12a5af8fab8f__main.js
+¦   ¦           slac-admin.hiapp.pk__08e38579e78e810b1c1f__polyfills-42372ed130431b0a.js
+¦   ¦           slac-admin.hiapp.pk__117d0148c415fd766a40__1691-e3f3cbc393b54dab.js
+¦   ¦           slac-admin.hiapp.pk__1ed44836c26151e9fec1__main-app-22fdc84a8b7cf163.js
+¦   ¦           slac-admin.hiapp.pk__5fe29f390410278b3e78__main.js
+¦   ¦           slac-admin.hiapp.pk__6212207d3d7c6da5f6c3__4bd1b696-cc729d47eba2cee4.js
+¦   ¦           slac-admin.hiapp.pk__64187a05767bf1f90caf__page-5b2ea3505e12228e.js
+¦   ¦           slac-admin.hiapp.pk__65032daa6286213e0a6d__6441-d380cc4ca7019d05.js
+¦   ¦           slac-admin.hiapp.pk__763242f83331d78c1f67__b496025c9cd768cc.css.js
+¦   ¦           slac-admin.hiapp.pk__97296de0115ff688950f__a9470041105eabdb.css.js
+¦   ¦           slac-admin.hiapp.pk__a8af781dfd3fc799e012__8e1d74a4-fd189d110704defc.js
+¦   ¦           slac-admin.hiapp.pk__b1dcb953920d6a972efe__9468c63d5d5149c4.css.js
+¦   ¦           slac-admin.hiapp.pk__b1e1f039164a35c807ad__layout-9d705da44466fa1a.js
+¦   ¦           slac-admin.hiapp.pk__bba60a88d42197483b47__page-70f8d01610829bac.js
+¦   ¦           slac-admin.hiapp.pk__bc2a66107fda2851e1d6__main.js
+¦   ¦           slac-admin.hiapp.pk__d83ea4405d7da63b9851__webpack-a6ca3bfb5f441b31.js
+¦   ¦           slac-admin.hiapp.pk__d83f26a35173be80a5b5__5964-909c2aa918bcc589.js
+¦   ¦           slac.hiapp.pk__049db9928bf93b79c3f2__0vj.i0_lan_-v.js
+¦   ¦           slac.hiapp.pk__0c2f19c1939f60d5bf17__0jk47yi_iqv3t.js
+¦   ¦           slac.hiapp.pk__139cfa23be3b0f3e2505__0qtz4meecy2cb.js
+¦   ¦           slac.hiapp.pk__1871328441d84f8c1abf__04x.4aw9cjgob.css.js
+¦   ¦           slac.hiapp.pk__1a9c741611097197b495__0d3shmwh5_nmn.js
+¦   ¦           slac.hiapp.pk__2113dad3e133d85b018b__main.js
+¦   ¦           slac.hiapp.pk__277be4ff7ba94deb3178__0quuvmrlcmk-6.js
+¦   ¦           slac.hiapp.pk__3e9927ba8eaa96835e3d__0fyjair2pnm64.js
+¦   ¦           slac.hiapp.pk__403bc6732993418ec1cf__0wduphktbtwx..js
+¦   ¦           slac.hiapp.pk__444c08df7ef32d870629__0f0clvep52g7r.css.js
+¦   ¦           slac.hiapp.pk__53e2900d166dae4bbf5f__15mijuab_88im.js
+¦   ¦           slac.hiapp.pk__5c8ab87c20762481187b__0bjl8xhggqecz.js
+¦   ¦           slac.hiapp.pk__60680fa6f066b7531622__main.js
+¦   ¦           slac.hiapp.pk__80ae1426d855e3aac4c6__0o4fgcovx5maq.js
+¦   ¦           slac.hiapp.pk__9bd31ce55135615298cc__0gv9og4em_gix.js
+¦   ¦           slac.hiapp.pk__9cda63e8f71939125a00__0uugwhbpb4j76.js
+¦   ¦           slac.hiapp.pk__9ea76ff6288b26a521ef__0v9c2uadhpd-i.js
+¦   ¦           slac.hiapp.pk__a135c01252db0710c654__0-lgosf17l-.7.css.js
+¦   ¦           slac.hiapp.pk__a64cddc90dac387aecce__0px0eusevds45.css.js
+¦   ¦           slac.hiapp.pk__a7c7482522dd621fafd4__turbopack-0x2x1imezpzhq.js
+¦   ¦           slac.hiapp.pk__acd6d4fe6ff497722c84__17ozfmu1xcx0n.css.js
+¦   ¦           slac.hiapp.pk__bb441a6c54a7054c15a3__0pqt_8bl3ukh4.js
+¦   ¦           slac.hiapp.pk__e2658dd09dd039707196__0-4oo_oi06i0r.js
+¦   ¦           slac.hiapp.pk__faebf02098a9dfc1cbc1__0k3omv9igz_rv.js
+¦   ¦           slac.hiapp.pk__fd7a40e61c0785b57167__03_yq9q893hmn.js
+¦   ¦           sync.hiapp.pk__1b72bbb36493e6b454e8__main.js
+¦   ¦           sync.hiapp.pk__3183dd37583bda3e24d8__main.js
+¦   ¦           web.hiapp.pk__78bdc99b9a7141910be0__main.js
+¦   ¦           web.hiapp.pk__c05dfcc697d7176185ac__main.js
+¦   ¦           xmpp.hiapp.pk__17bd5a6833faa24dc8b1__5964-909c2aa918bcc589.js
+¦   ¦           xmpp.hiapp.pk__2643e6419a70a84f8e2e__8e1d74a4-fd189d110704defc.js
+¦   ¦           xmpp.hiapp.pk__35373fc5ac965161b7be__41ade5dc-6217ca861f16b523.js
+¦   ¦           xmpp.hiapp.pk__3ad5df08519684e76913__4bd1b696-cc729d47eba2cee4.js
+¦   ¦           xmpp.hiapp.pk__56be1e263f68a5f42ac8__1894-730bb732cf37bd83.js
+¦   ¦           xmpp.hiapp.pk__71cb06b2e2e80272f008__2170a4aa-eb49983ef9e66789.js
+¦   ¦           xmpp.hiapp.pk__75e7fd58e5ec2b4eaf99__8608-22abdc4347c4a6eb.js
+¦   ¦           xmpp.hiapp.pk__b40ccfeab84273030ae4__6441-d380cc4ca7019d05.js
+¦   ¦           
+¦   +---wappalyzer_next
+¦   ¦       full_targets.txt
+¦   ¦       
+¦   +---whatweb
+¦           targets.txt
+¦           
++---tool_logs
+        amass.stderr.txt
+        amass.stdout.txt
+        bbot.stderr.txt
+        bbot.stdout.txt
+        dnsx_browser_discovered.stderr.txt
+        dnsx_browser_discovered.stdout.txt
+        dnsx_chunk_0001.stderr.txt
+        dnsx_chunk_0001.stdout.txt
+        dnsx_gobuster_new.stderr.txt
+        dnsx_gobuster_new.stdout.txt
+        dnsx_priority.stderr.txt
+        dnsx_priority.stdout.txt
+        dnsx_wildcards.stderr.txt
+        dnsx_wildcards.stdout.txt
+        gobuster_base.stderr.txt
+        gobuster_base.stdout.txt
+        gobuster_custom.stderr.txt
+        gobuster_custom.stdout.txt
+        httpx_browser_discovered.stderr.txt
+        httpx_browser_discovered.stdout.txt
+        httpx_probe.stderr.txt
+        httpx_probe.stdout.txt
+        httpx_recursive_screenshot_l1.stderr.txt
+        httpx_recursive_screenshot_l1.stdout.txt
+        httpx_root_probe.stderr.txt
+        httpx_root_probe.stdout.txt
+        httpx_screenshot.stderr.txt
+        httpx_screenshot.stdout.txt
+        katana_canonical.stderr.txt
+        katana_canonical.stdout.txt
+        katana_recursive_l1_adminbackend.hiapp.pk_31d3788d.stderr.txt
+        katana_recursive_l1_adminbackend.hiapp.pk_31d3788d.stdout.txt
+        katana_recursive_l1_api-slac-admin.hiapp.pk_6c5e1241.stderr.txt
+        katana_recursive_l1_api-slac-admin.hiapp.pk_6c5e1241.stdout.txt
+        katana_recursive_l1_api-slac.hiapp.pk_f49a8a83.stderr.txt
+        katana_recursive_l1_api-slac.hiapp.pk_f49a8a83.stdout.txt
+        katana_recursive_l1_backend.hiapp.pk_e64e4f4b.stderr.txt
+        katana_recursive_l1_backend.hiapp.pk_e64e4f4b.stdout.txt
+        katana_recursive_l1_call.hiapp.pk_7ee1b1d2.stderr.txt
+        katana_recursive_l1_call.hiapp.pk_7ee1b1d2.stdout.txt
+        katana_recursive_l1_chat.hiapp.pk_5524ba0a.stderr.txt
+        katana_recursive_l1_chat.hiapp.pk_5524ba0a.stdout.txt
+        katana_recursive_l1_email.otp.hiapp.pk_1b653298.stderr.txt
+        katana_recursive_l1_email.otp.hiapp.pk_1b653298.stdout.txt
+        katana_recursive_l1_file.hiapp.pk_6908d9d2.stderr.txt
+        katana_recursive_l1_file.hiapp.pk_6908d9d2.stdout.txt
+        katana_recursive_l1_mail.hiapp.pk_f48c9acf.stderr.txt
+        katana_recursive_l1_mail.hiapp.pk_f48c9acf.stdout.txt
+        katana_recursive_l1_reg.hiapp.pk_5959cb65.stderr.txt
+        katana_recursive_l1_reg.hiapp.pk_5959cb65.stdout.txt
+        katana_recursive_l1_slac-admin.hiapp.pk_6fe4499a.stderr.txt
+        katana_recursive_l1_slac-admin.hiapp.pk_6fe4499a.stdout.txt
+        katana_recursive_l1_slac.hiapp.pk_72604529.stderr.txt
+        katana_recursive_l1_slac.hiapp.pk_72604529.stdout.txt
+        katana_recursive_l1_sync.hiapp.pk_49b8b896.stderr.txt
+        katana_recursive_l1_sync.hiapp.pk_49b8b896.stdout.txt
+        katana_recursive_l1_web.hiapp.pk_98003fc6.stderr.txt
+        katana_recursive_l1_web.hiapp.pk_98003fc6.stdout.txt
+        katana_recursive_l1_xmpp.hiapp.pk_95f4435a.stderr.txt
+        katana_recursive_l1_xmpp.hiapp.pk_95f4435a.stdout.txt
+        subfinder.stderr.txt
+        subfinder.stdout.txt
+        wafw00f.stderr.txt
+        wafw00f.stdout.txt
+        

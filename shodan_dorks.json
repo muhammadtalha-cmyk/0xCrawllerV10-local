@@ -1,0 +1,226 @@
+[
+  {
+    "id": "scope_inventory",
+    "category": "asset_inventory",
+    "purpose": "Baseline inventory for the selected organization scope.",
+    "query_template": "{scope}",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "port,org,product,asn",
+    "enabled_by_default": true
+  },
+  {
+    "id": "certificate_cn_exact",
+    "category": "tls_asset_discovery",
+    "purpose": "Find services whose certificate common name equals the target domain.",
+    "query_template": "{scope} ssl.cert.subject.cn:\"{target}\"",
+    "scope_types": [
+      "target"
+    ],
+    "facets": "ssl.cert.issuer.cn,port,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "certificate_cn_wildcard",
+    "category": "tls_asset_discovery",
+    "purpose": "Find services presenting a wildcard certificate for the target domain.",
+    "query_template": "{scope} ssl.cert.subject.cn:\"*.{target}\"",
+    "scope_types": [
+      "target"
+    ],
+    "facets": "ssl.cert.issuer.cn,port,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "ssl_text_reference",
+    "category": "tls_asset_discovery",
+    "purpose": "Find SSL/TLS metadata that references the target domain.",
+    "query_template": "{scope} ssl:\"{target}\"",
+    "scope_types": [
+      "target"
+    ],
+    "facets": "ssl.cert.subject.cn,ssl.cert.issuer.cn,port,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "https_services",
+    "category": "web",
+    "purpose": "HTTPS services associated with the selected scope.",
+    "query_template": "{scope} port:443",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "http.title,http.status,product,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "alternate_https",
+    "category": "web",
+    "purpose": "Common alternate HTTPS management or application port.",
+    "query_template": "{scope} port:8443",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "http.title,product,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "tls_inventory",
+    "category": "tls",
+    "purpose": "Services where Shodan observed SSL/TLS metadata.",
+    "query_template": "{scope} has_ssl:true",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "ssl.version,ssl.cert.issuer.cn,port",
+    "enabled_by_default": true
+  },
+  {
+    "id": "ssh_exposure",
+    "category": "remote_access",
+    "purpose": "SSH exposure within the authorized scope.",
+    "query_template": "{scope} port:22",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,os,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "rdp_exposure",
+    "category": "remote_access",
+    "purpose": "RDP exposure within the authorized scope.",
+    "query_template": "{scope} port:3389",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,os,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "vpn_common",
+    "category": "remote_access",
+    "purpose": "Common IPsec/IKE VPN service port within the authorized scope.",
+    "query_template": "{scope} port:500",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,org,asn",
+    "enabled_by_default": true
+  },
+  {
+    "id": "mail_smtp",
+    "category": "mail",
+    "purpose": "SMTP services associated with the scope.",
+    "query_template": "{scope} port:25",
+    "scope_types": [
+      "hostname",
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,org",
+    "enabled_by_default": true
+  },
+  {
+    "id": "elasticsearch",
+    "category": "database_search",
+    "purpose": "Elasticsearch service exposure within explicit organization, ASN, or network scope.",
+    "query_template": "{scope} port:9200",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,org",
+    "enabled_by_default": false
+  },
+  {
+    "id": "mongodb",
+    "category": "database",
+    "purpose": "MongoDB service exposure within explicit organization, ASN, or network scope.",
+    "query_template": "{scope} port:27017",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,org",
+    "enabled_by_default": false
+  },
+  {
+    "id": "redis",
+    "category": "database",
+    "purpose": "Redis service exposure within explicit organization, ASN, or network scope.",
+    "query_template": "{scope} port:6379",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,org",
+    "enabled_by_default": false
+  },
+  {
+    "id": "kubernetes",
+    "category": "orchestration",
+    "purpose": "Kubernetes-related banners within explicit organization, ASN, or network scope.",
+    "query_template": "{scope} product:\"Kubernetes\"",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,port,org",
+    "enabled_by_default": false
+  },
+  {
+    "id": "jenkins",
+    "category": "devops",
+    "purpose": "Jenkins-related banners within explicit organization, ASN, or network scope.",
+    "query_template": "{scope} product:\"Jenkins\"",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "product,version,port,org",
+    "enabled_by_default": false
+  },
+  {
+    "id": "known_vulnerability_metadata",
+    "category": "vulnerability_metadata",
+    "purpose": "Services for which Shodan has vulnerability metadata. Plan/API restrictions may apply.",
+    "query_template": "{scope} has_vuln:true",
+    "scope_types": [
+      "org",
+      "asn",
+      "net"
+    ],
+    "facets": "vuln,product,port,org",
+    "enabled_by_default": false,
+    "risk": "passive_plan_dependent"
+  }
+]

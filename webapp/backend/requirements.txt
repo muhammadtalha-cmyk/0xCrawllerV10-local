@@ -1,0 +1,11 @@
+fastapi>=0.128,<1
+uvicorn[standard]>=0.35,<1
+pydantic>=2.10,<3
+pytest>=8,<10
+httpx>=0.27,<1
+psycopg[binary]>=3.2,<4
+psycopg-pool>=3.2,<4
+passlib[bcrypt]>=1.7,<2
+PyJWT>=2.8,<3
+python-multipart>=0.0.18,<1
+cloudinary>=1.41,<2

@@ -1,0 +1,10 @@
+V8.4.1 safety correction files
+
+- smart_recon/config.py
+- smart_recon/portscan.py
+- smart_recon/edge_detection.py
+- smart_recon/reporting.py
+- smart_recon/__init__.py
+- tests/test_portscan_v83.py
+- tests/test_edge_detection.py
+- README_V8_4_1_SAFETY_FIX.md

@@ -1,0 +1,10 @@
+tunnel: <your-tunnel-uuid>
+credentials-file: /root/.cloudflared/<your-tunnel-uuid>.json
+
+ingress:
+  # Route the backend API (HTTP/WebSocket) to the FastAPI server
+  - hostname: api.yourdomain.com
+    service: http://127.0.0.1:8000
+  
+  # Catch-all rule that returns a 404 for unmatched hostnames
+  - service: http_status:404

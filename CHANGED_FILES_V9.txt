@@ -1,0 +1,13 @@
+V9 new files:
+- vapt_asset_normalizer_v9.py
+- run-v9-normalize.cmd
+- README_V9_ASSET_NORMALIZATION.md
+- asset_normalization/__init__.py
+- asset_normalization/cli.py
+- asset_normalization/engine.py
+- asset_normalization/endpoint_rules.py
+- asset_normalization/identity.py
+- asset_normalization/io_utils.py
+- asset_normalization/policy.py
+- asset_normalization/reporting.py
+- tests/test_v9_normalization.py

@@ -1,0 +1,10 @@
+V9.1 technology/version enrichment additions:
+- vapt_technology_enricher_v9_1.py
+- technology_enrichment/*
+- tools/whatweb/Dockerfile
+- tools/retirejs/Dockerfile
+- build-v9.1-tech-images.cmd
+- run-v9.1-tech-max.cmd
+- technology_tools.lock.json
+- README_V9_1_TECHNOLOGY_ENRICHMENT.md
+- tests/test_v9_1_technology_enrichment.py

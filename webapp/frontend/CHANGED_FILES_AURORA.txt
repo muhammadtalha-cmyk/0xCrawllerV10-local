@@ -1,0 +1,33 @@
+0xCrawller Aurora frontend redesign
+
+NEW
+- AURORA_FRONTEND_README.md
+- CHANGED_FILES_AURORA.txt
+- lib/securityIntelligence.ts
+- components/intelligence/AttackSurfaceView.tsx
+- components/intelligence/ScreenshotView.tsx
+- components/intelligence/SecurityOverview.tsx
+- components/intelligence/TechnicalEvidenceView.tsx
+- components/intelligence/TechnologyLogo.tsx
+- components/intelligence/TechnologyView.tsx
+- components/intelligence/VulnerabilityView.tsx
+
+UPDATED
+- app/globals.css
+- app/layout.tsx
+- app/page.tsx
+- components/CodeBlock.tsx
+- components/Header.tsx
+- components/Icons.tsx
+- components/MarkdownReport.tsx
+- components/ReportDashboard.tsx
+- components/ScanCard.tsx
+- components/ScanDetailClient.tsx
+- components/SeverityChart.tsx
+
+PRESERVED
+- Backend/API contracts
+- WebSocket and polling flow
+- Scan orchestration and scanner scripts
+- Artifact indexing and screenshot serving
+- Existing routes and scan cancellation

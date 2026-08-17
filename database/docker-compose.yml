@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: recon-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: recon
+      POSTGRES_PASSWORD: reconpass
+      POSTGRES_DB: recondb
+    ports:
+      - "5432:5432"
+    volumes:
+      - recon_pgdata:/var/lib/postgresql/data
+
+volumes:
+  recon_pgdata:

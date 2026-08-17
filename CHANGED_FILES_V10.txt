@@ -1,0 +1,14 @@
+V10 Combined Report additions
+
+Added:
+- vapt_combined_report_v10.py
+- run-v10-combined-report.cmd
+- README_V10_COMBINED_REPORT.md
+- CHANGED_FILES_V10.txt
+
+Generated example:
+- recon_runs/hiapp.pk-20260730-122328/combined_vapt_intelligence_report.md
+
+Validation:
+- Python compilation passed
+- Existing test suite: 92 passed

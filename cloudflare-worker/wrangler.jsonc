@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "0xcrawller-api-proxy",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-11",
+  "workers_dev": true,
+  "vars": {
+    "BACKEND_ORIGIN": "https://ward-clients-delays-hepatitis.trycloudflare.com",
+    "FRONTEND_ORIGIN": "https://0xcrawller-v10.vercel.app"
+  }
+}

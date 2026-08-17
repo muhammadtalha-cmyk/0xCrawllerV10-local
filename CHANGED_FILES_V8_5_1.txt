@@ -1,0 +1,17 @@
+Smart Recon V8.5.1 changed files
+
+smart_recon/__init__.py
+smart_recon/cli.py
+smart_recon/commands.py
+smart_recon/parsers.py
+smart_recon/pipeline.py
+smart_recon/portscan.py
+smart_recon/recursive_recon.py
+smart_recon/reporting.py
+smart_recon/screenshots.py
+tests/test_portscan_v83.py
+tests/test_recursive_recon_v85.py
+tests/test_normalization_v851.py
+run-max-v8.5-recursive.cmd
+run-max-v8.5.1-recursive.cmd
+README_V8_5_1_NORMALIZATION_FIX.md
