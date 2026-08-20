@@ -43,10 +43,6 @@ class Settings:
     auth_cookie_secure: bool
     auth_cookie_samesite: str
 
-    # Cloudinary
-    cloudinary_cloud_name: str | None
-    cloudinary_api_key: str | None
-    cloudinary_api_secret: str | None
 
     @classmethod
     def load(cls) -> "Settings":
@@ -210,20 +206,7 @@ class Settings:
             auth_cookie_secure=auth_cookie_secure,
             auth_cookie_samesite=auth_cookie_samesite,
 
-            cloudinary_cloud_name=(
-                os.getenv("CLOUDINARY_CLOUD_NAME")
-                or None
-            ),
 
-            cloudinary_api_key=(
-                os.getenv("CLOUDINARY_API_KEY")
-                or None
-            ),
-
-            cloudinary_api_secret=(
-                os.getenv("CLOUDINARY_API_SECRET")
-                or None
-            ),
         )
 
 

@@ -78,7 +78,7 @@ async def health() -> dict[str, object]:
     return {
         "status": "ok",
         "project_root": str(settings.project_root),
-        "scanner_mode": "mock" if settings.mock_scanner else "windows-cmd",
+        "scanner_mode": "mock" if settings.mock_scanner else "cross-platform",
         "database": "postgresql" if settings.database_url else "sqlite",
     }
 
@@ -230,9 +230,7 @@ async def download_artifact(
         raise HTTPException(status_code=403, detail="Not authorized")
 
     if not path:
-        if artifact.get("cloudinary_url"):
-            return RedirectResponse(artifact["cloudinary_url"])
-        raise HTTPException(status_code=404, detail="Artifact file is unavailable locally and not in Cloudinary")
+        raise HTTPException(status_code=404, detail="Artifact file is unavailable locally")
 
     return FileResponse(
         path,
@@ -258,12 +256,7 @@ async def read_artifact_text(
         raise HTTPException(status_code=403, detail="Not authorized")
 
     if not path:
-        if artifact.get("cloudinary_url"):
-            async with httpx.AsyncClient() as client:
-                resp = await client.get(artifact["cloudinary_url"])
-                if resp.status_code == 200:
-                    return PlainTextResponse(resp.text)
-        raise HTTPException(status_code=404, detail="Artifact file is unavailable")
+        raise HTTPException(status_code=404, detail="Artifact file is unavailable locally")
 
     if path.suffix.lower() not in {
         ".md", ".txt", ".json", ".jsonl", ".csv", ".mmd"

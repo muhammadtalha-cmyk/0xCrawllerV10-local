@@ -11,12 +11,12 @@ echo "============================================="
 # Start Backend
 echo "[START] Starting Backend API..."
 cd "$(dirname "$0")/backend"
-./start-backend.sh &
+bash ./start-backend.sh &
 BACKEND_PID=$!
 
 # Start Worker
 echo "[START] Starting Persistent Scan Worker..."
-./start-worker.sh &
+bash ./start-worker.sh &
 WORKER_PID=$!
 
 # Start Frontend

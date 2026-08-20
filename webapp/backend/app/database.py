@@ -190,6 +190,124 @@ class Database:
                     """
                 )
 
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS assets (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        hostname TEXT,
+                        fqdn TEXT,
+                        asset_type TEXT,
+                        ip_address TEXT,
+                        status TEXT,
+                        source TEXT,
+                        metadata JSONB DEFAULT '{}'::jsonb
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS dns_records (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        record_type TEXT,
+                        value TEXT,
+                        ttl INTEGER,
+                        source TEXT
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS ports (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        port INTEGER,
+                        protocol TEXT,
+                        state TEXT,
+                        service TEXT,
+                        banner TEXT
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS technologies (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        name TEXT,
+                        category TEXT,
+                        version TEXT,
+                        confidence TEXT,
+                        detection_source TEXT,
+                        evidence JSONB DEFAULT '{}'::jsonb
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS endpoints (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        url TEXT,
+                        path TEXT,
+                        method TEXT,
+                        status_code INTEGER,
+                        content_type TEXT,
+                        source TEXT
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS screenshots (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        url TEXT,
+                        image_path TEXT,
+                        captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS evidence (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        evidence_type TEXT,
+                        source TEXT,
+                        content JSONB
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS findings (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        finding_type TEXT,
+                        severity TEXT,
+                        confidence TEXT,
+                        description TEXT,
+                        status TEXT DEFAULT 'needs_validation'
+                    )
+                    """
+                )
+
                 connection.commit()
 
             return

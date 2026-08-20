@@ -2,24 +2,12 @@ import logging
 import mimetypes
 from pathlib import Path
 
-import cloudinary
-import cloudinary.uploader
 
 from .config import settings
 from .database import Database
 
 logger = logging.getLogger("crawller.artifacts")
 
-if settings.cloudinary_cloud_name and settings.cloudinary_api_key and settings.cloudinary_api_secret:
-    cloudinary.config(
-        cloud_name=settings.cloudinary_cloud_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True,
-    )
-    CLOUDINARY_ENABLED = True
-else:
-    CLOUDINARY_ENABLED = False
 
 ALLOWED_SUFFIXES = {
     ".md", ".json", ".jsonl", ".csv", ".txt", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".mmd"
@@ -99,16 +87,6 @@ def index_run_artifacts(db: Database, project_root: Path, scan_id: str, run_dir:
         cloudinary_url = None
         cloudinary_public_id = None
         
-        if CLOUDINARY_ENABLED and (kind in {"report", "screenshot"} or resolved.suffix.lower() in {".json", ".csv"}):
-            try:
-                res = cloudinary.uploader.upload(
-                    str(resolved), 
-                    resource_type="auto"
-                )
-                cloudinary_url = res.get("secure_url")
-                cloudinary_public_id = res.get("public_id")
-            except Exception as e:
-                logger.error(f"Cloudinary upload failed for {resolved.name}: {e}")
 
         db.upsert_artifact(
             scan_id=scan_id,
@@ -124,4 +102,11 @@ def index_run_artifacts(db: Database, project_root: Path, scan_id: str, run_dir:
         indexed += 1
         if indexed >= 5000:
             break
+
+    try:
+        from .ingest import ingest_scan_results
+        ingest_scan_results(db, scan_id, str(run_dir))
+    except Exception as e:
+        logger.error(f"Failed to ingest scan results to database: {e}", exc_info=True)
+
     return indexed
