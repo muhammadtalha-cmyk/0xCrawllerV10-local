@@ -17,9 +17,7 @@ async function request<T>(
     {
       cache: "no-store",
       credentials: "include",
-
       ...init,
-
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -29,19 +27,15 @@ async function request<T>(
   );
 
   if (!response.ok) {
-    let message =
-      `Request failed (${response.status})`;
-
+    let message = `Request failed (${response.status})`;
     try {
       const body = await response.json();
-
       if (typeof body?.detail === "string") {
         message = body.detail;
       }
     } catch {
       // Keep default.
     }
-
     throw new Error(message);
   }
 
@@ -58,79 +52,80 @@ export const api = {
   createScan: (target: string) =>
     request<Scan>("/api/scans", {
       method: "POST",
-      body: JSON.stringify({
-        target,
-        authorized: true,
-      }),
+      body: JSON.stringify({ target, authorized: true }),
     }),
 
   cancelScan: (id: string) =>
-    request<{ accepted: boolean }>(
-      `/api/scans/${id}/cancel`,
-      {
-        method: "POST",
-      }
-    ),
+    request<{ accepted: boolean }>(`/api/scans/${id}/cancel`, { method: "POST" }),
 
-  getLogs: (
-    id: string,
-    afterId = 0
-  ) =>
-    request<ScanLog[]>(
-      `/api/scans/${id}/logs?after_id=${afterId}`
-    ),
+  getLogs: (id: string, afterId = 0) =>
+    request<ScanLog[]>(`/api/scans/${id}/logs?after_id=${afterId}`),
 
   getArtifacts: (id: string) =>
-    request<Artifact[]>(
-      `/api/scans/${id}/artifacts`
-    ),
+    request<Artifact[]>(`/api/scans/${id}/artifacts`),
 
-  artifactUrl: (
-    id: string,
-    download = false
-  ) => {
+  artifactUrl: (id: string, download = false) => {
     const params = new URLSearchParams();
-
-    if (download) {
-      params.set("download", "true");
-    }
-
+    if (download) params.set("download", "true");
     const query = params.toString();
-
-    return `${API_URL}/api/artifacts/${id}${
-      query ? `?${query}` : ""
-    }`;
+    return `${API_URL}/api/artifacts/${id}${query ? `?${query}` : ""}`;
   },
 
-  artifactText: async (id: string) => {
-    const response = await fetch(
-      `${API_URL}/api/artifacts/${id}/text`,
-      {
-        cache: "no-store",
-        credentials: "include",
-        headers: {
-          Accept: "text/plain",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Unable to open artifact (${response.status})`
-      );
-    }
-
+  artifactText: async (id: string, maxBytes?: number) => {
+    const url = new URL(`${API_URL}/api/artifacts/${id}/text`);
+    if (maxBytes) url.searchParams.set("max_bytes", String(maxBytes));
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+      credentials: "include",
+      headers: { Accept: "text/plain" },
+    });
+    if (!response.ok) throw new Error(`Unable to open artifact (${response.status})`);
     return response.text();
   },
+
+  getMetrics: (scanId: string) =>
+    request<any>(`/api/scans/${scanId}/metrics`),
+
+  getAssets: (scanId: string, limit = 50, offset = 0, q = "") =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/assets?limit=${limit}&offset=${offset}&q=${encodeURIComponent(q)}`
+    ),
+
+  getServices: (scanId: string, limit = 50, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/services?limit=${limit}&offset=${offset}`
+    ),
+
+  getTechnologies: (scanId: string, limit = 50, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/technologies?limit=${limit}&offset=${offset}`
+    ),
+
+  getEndpoints: (scanId: string, limit = 50, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/endpoints?limit=${limit}&offset=${offset}`
+    ),
+
+  getFindings: (scanId: string, limit = 50, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/findings?limit=${limit}&offset=${offset}`
+    ),
+
+  getCveFindings: (scanId: string, limit = 100, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/cve-findings?limit=${limit}&offset=${offset}`
+    ),
+
+  getRelationships: (scanId: string, limit = 50, offset = 0) =>
+    request<{ total: number; items: any[] }>(
+      `/api/scans/${scanId}/relationships?limit=${limit}&offset=${offset}`
+    ),
+
+  getReportSections: (scanId: string, reportType: string) =>
+    request<any[]>(`/api/scans/${scanId}/reports/${reportType}`),
 };
 
-export function scanSocketUrl(
-  scanId: string
-): string {
-  const base = API_URL.replace(
-    /^http/,
-    "ws"
-  );
-
+export function scanSocketUrl(scanId: string): string {
+  const base = API_URL.replace(/^http/, "ws");
   return `${base}/ws/scans/${scanId}`;
 }

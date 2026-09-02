@@ -76,6 +76,10 @@ async def get_token_from_request(
     if token:
         return token
 
+    query_token = request.query_params.get("token")
+    if query_token:
+        return query_token
+
     # Fall back to the HTTP-only authentication cookie.
     cookie_token = request.cookies.get(
         settings.auth_cookie_name

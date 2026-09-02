@@ -946,6 +946,15 @@ def run_pipeline(args: Namespace) -> int:
             args.screenshot_timeout,
         )
         tool_results.append(screenshot_result)
+        try:
+            subprocess.run(
+                ["docker", "run", "--rm", "-v", f"{str(run_dir.resolve())}:/output", "alpine", "sh", "-c", "chmod -R a+rX /output 2>/dev/null || true"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=30,
+            )
+        except Exception:
+            pass
     screenshot_status, screenshot_files = build_screenshot_status(
         run_dir, screenshot_requested, screenshot_result, screenshot_coverage
     )

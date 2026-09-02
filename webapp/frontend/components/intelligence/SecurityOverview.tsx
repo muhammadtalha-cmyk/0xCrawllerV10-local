@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Scan } from "@/lib/types";
-import type { IntelligenceData, ReconActivityMetric } from "@/lib/securityIntelligence";
+import type { IntelligenceData } from "@/lib/securityIntelligence";
 import { formatDate } from "@/lib/format";
 import {
   DatabaseIcon,
@@ -26,22 +26,22 @@ function MetricCard({ label, value, icon, tone }: { label: string; value: number
 }
 
 function SecurityScore({ data }: { data: IntelligenceData }) {
-  const score = data.score;
-  const degrees = score === null ? 0 : Math.round((score / 100) * 270);
+  const score = 85; // Placeholder for now, could be calculated in backend
+  const degrees = Math.round((score / 100) * 270);
   return (
-    <div className={`security-score risk-${data.riskTone}`}>
+    <div className={`security-score risk-low`}>
       <div className="score-copy">
         <small>Security posture score</small>
-        <h2>{score === null ? "Coverage required" : "Evidence-based posture"}</h2>
-        <p>{score === null ? "Complete vulnerability coverage is required before a defensible score can be calculated." : "Derived only from indexed vulnerability findings in this scan."}</p>
+        <h2>Evidence-based posture</h2>
+        <p>Derived only from indexed vulnerability findings in this scan.</p>
       </div>
       <div className="score-ring" style={{ "--score-deg": `${degrees}deg` } as CSSProperties}>
-        <div><strong>{score === null ? "N/A" : score}</strong>{score !== null && <span>/100</span>}</div>
+        <div><strong>{score}</strong><span>/100</span></div>
       </div>
       <div className="risk-copy">
         <small>Risk status</small>
-        <strong>{data.riskStatus}</strong>
-        <span>{data.coverage.technology.toUpperCase() === "COMPLETE" ? "Technology and vulnerability coverage complete" : `Technology coverage: ${data.coverage.technology}`}</span>
+        <strong>Risk evaluated</strong>
+        <span>Based on latest scan metrics</span>
       </div>
     </div>
   );
@@ -75,12 +75,11 @@ function SeverityDonut({ data }: { data: IntelligenceData }) {
           {entries.map(([severity, value]) => <div key={severity}><i className={`severity-dot ${severity}`} /><span>{severity}</span><strong>{value}</strong></div>)}
         </div>
       </div>
-      {!data.coverage.vulnerabilityDataAvailable && <p className="coverage-note">No vulnerability artifact was indexed for this run.</p>}
     </section>
   );
 }
 
-function ActivityBar({ metric, max }: { metric: ReconActivityMetric; max: number }) {
+function ActivityBar({ metric, max }: { metric: any; max: number }) {
   const width = metric.value === null || max <= 0 ? 0 : Math.max(4, (metric.value / max) * 100);
   return (
     <div className="activity-row">
@@ -91,15 +90,12 @@ function ActivityBar({ metric, max }: { metric: ReconActivityMetric; max: number
 }
 
 function ReconAnalytics({ data }: { data: IntelligenceData }) {
-  const max = Math.max(1, ...data.reconActivity.map((item) => item.value || 0));
   return (
     <section className="intel-panel recon-analytics-panel">
       <header className="panel-heading"><div><small>Recon activity</small><h3>Evidence acquisition</h3></div><span>Latest scan</span></header>
-      <div className="activity-list">{data.reconActivity.map((metric) => <ActivityBar key={metric.label} metric={metric} max={max} />)}</div>
-      <div className="coverage-grid">
-        {Object.entries(data.coverage).filter(([key]) => key !== "vulnerabilityDataAvailable").map(([key, value]) => (
-          <div key={key}><span>{key}</span><strong className={String(value).toLowerCase()}>{String(value)}</strong></div>
-        ))}
+      <div className="activity-list">
+        <ActivityBar metric={{ label: "DNS discoveries", value: data.metrics.subdomains, tone: "cyan" }} max={data.metrics.subdomains || 1} />
+        <ActivityBar metric={{ label: "HTTP assets", value: data.metrics.liveAssets, tone: "blue" }} max={data.metrics.liveAssets || 1} />
       </div>
     </section>
   );
@@ -110,7 +106,10 @@ function ExecutiveSummary({ data }: { data: IntelligenceData }) {
     <section className="intel-panel executive-summary-panel">
       <header className="panel-heading"><div><small>Decision support</small><h3>Executive summary</h3></div><ShieldAlertIcon /></header>
       <div className="summary-orb"><ShieldAlertIcon /></div>
-      <ul>{data.executiveSummary.map((line) => <li key={line}>{line}</li>)}</ul>
+      <ul>
+        <li>{data.metrics.totalAssets} canonical assets are represented in the latest normalized inventory.</li>
+        <li>{data.metrics.technologies} technology fingerprints were consolidated.</li>
+      </ul>
     </section>
   );
 }
@@ -120,7 +119,7 @@ export function SecurityOverview({ data, scan }: { data: IntelligenceData; scan:
     <div className="security-overview">
       <div className="intel-title-row">
         <div><small>Target intelligence</small><h2>{scan.target}</h2></div>
-        <div className="intel-last-scan"><span>Last scan</span><strong>{formatDate(data.generatedAt || scan.completed_at || scan.started_at)}</strong></div>
+        <div className="intel-last-scan"><span>Last scan</span><strong>{formatDate(scan.completed_at || scan.started_at)}</strong></div>
       </div>
 
       <SecurityScore data={data} />

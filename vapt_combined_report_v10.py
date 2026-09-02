@@ -267,6 +267,11 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
     tech_tools_path = tech_dir / "technology_tool_status.json"
     tech_report_path = tech_dir / "technology_enrichment_report.md"
 
+    cve_dir = run_dir / "cve_detection"
+    cve_summary_path = cve_dir / "cve_summary.json"
+    cve_findings_path = cve_dir / "cve_findings.json"
+    cve_report_path = cve_dir / "cve_report.md"
+
     recon = load_json(recon_summary_path, {})
     norm_summary = load_json(norm_summary_path, {})
     assets = load_json(norm_assets_path, [])
@@ -282,6 +287,19 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
     tech_conflicts = load_json(tech_conflicts_path, [])
     tech_queue = load_json(tech_queue_path, [])
     tech_tools = load_json(tech_tools_path, {})
+
+    cve_summary = load_json(cve_summary_path, {})
+    cve_findings_raw = load_json(cve_findings_path, {})
+    if isinstance(cve_findings_raw, dict):
+        cve_findings = cve_findings_raw.get("findings", [])
+    elif isinstance(cve_findings_raw, list):
+        cve_findings = cve_findings_raw
+    else:
+        cve_findings = []
+    if not isinstance(cve_findings, list):
+        cve_findings = []
+    cve_counts = cve_summary.get("counts", {}) if isinstance(cve_summary, dict) else {}
+    cve_status = str(cve_summary.get("status", "COMPLETE" if cve_findings else ("NOT_RUN" if not cve_summary_path.is_file() else "COMPLETE")))
 
     if not isinstance(assets, list):
         assets = []
@@ -402,6 +420,9 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
     lines.append(
         f"| 3. Technology identification | Correlate HTTP, JavaScript, tool fingerprints, and eligible service evidence | `{status_icon(technology_status)}` | `{tech_summary_path.relative_to(run_dir)}` |"
     )
+    lines.append(
+        f"| 4. CVE Intelligence | Correlate software versions against NVD database to identify CVEs and CVSS severities | `{status_icon(cve_status)}` | `{cve_summary_path.relative_to(run_dir) if cve_summary_path.is_file() else 'cve_detection/cve_summary.json'}` |"
+    )
     lines.append("")
 
     lines.append("## Executive coverage")
@@ -419,6 +440,9 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
         ("Technology records", len(technologies) or tech_counts.get("technologies", 0), "Per-host technology/component fingerprints"),
         ("Exact versions", len(exact_versions) or tech_counts.get("exact_versions", 0), "Versions supported by defensible evidence"),
         ("Versions not exposed", version_hidden, "Detected products without an exact observed version"),
+        ("Identified CVEs", len(cve_findings) or cve_counts.get("total", 0), "Total CVE vulnerabilities matched to detected versions"),
+        ("Critical CVEs", cve_counts.get("critical", sum(1 for f in cve_findings if str(f.get("severity", "")).upper() == "CRITICAL")), "Vulnerabilities with CVSS >= 9.0"),
+        ("High CVEs", cve_counts.get("high", sum(1 for f in cve_findings if str(f.get("severity", "")).upper() == "HIGH")), "Vulnerabilities with CVSS 7.0 - 8.9"),
         ("Technology conflicts", len(tech_conflicts), "Conflicting technology/version observations"),
         ("Normalization conflicts", len(norm_conflicts), "Evidence requiring reconciliation or revalidation"),
         ("Normalization revalidation items", len(norm_queue), "Assets/endpoints queued for additional validation"),
@@ -543,6 +567,24 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
         lines.append("Technology tool status data was not available.")
     lines.append("")
 
+    lines.append("## CVE Intelligence")
+    lines.append("")
+    if cve_findings:
+        lines.append("| Product | Version | CVE | Severity | CVSS | Affected Hosts |")
+        lines.append("|---|---|---|---|---|---|")
+        for item in cve_findings:
+            hosts = item.get("hosts", [])
+            hosts_str = ", ".join(hosts[:3]) + (f" (+{len(hosts)-3} more)" if len(hosts) > 3 else "")
+            cve_id = item.get("cve") or item.get("cve_id") or "UNKNOWN"
+            source = item.get("source") or f"https://nvd.nist.gov/vuln/detail/{cve_id}"
+            lines.append(
+                f"| {md(item.get('product'))} | {code(item.get('version'))} | [{cve_id}]({source}) | "
+                f"{md(item.get('severity', 'UNKNOWN'))} | {md(item.get('cvss', 'N/A'))} | {code(hosts_str)} |"
+            )
+    else:
+        lines.append("No CVE matches identified.")
+    lines.append("")
+
     lines.append("## Services and ports")
     lines.append("")
     current_service_rows = [
@@ -650,6 +692,9 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
         tech_queue_path,
         tech_tools_path,
         tech_report_path,
+        cve_summary_path,
+        cve_findings_path,
+        cve_report_path,
     ]
     for path in evidence_paths:
         status = "read" if path.is_file() else "missing"
@@ -665,6 +710,7 @@ def build_report(run_dir: Path, target: str, summary_only: bool, max_assets: int
             ("Reconnaissance source report", recon_report_path),
             ("Normalization source report", norm_report_path),
             ("Technology source report", tech_report_path),
+            ("CVE intelligence source report", cve_report_path),
         ]
         lines.append("## Embedded source reports")
         lines.append("")

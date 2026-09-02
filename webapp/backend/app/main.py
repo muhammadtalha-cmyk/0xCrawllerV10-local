@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,6 +17,7 @@ from fastapi import (
     status,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
 import httpx
 from pydantic import BaseModel, Field
@@ -71,6 +73,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "X-API-Key", "Authorization", "Cookie"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 
 @app.get("/api/health")
@@ -248,6 +251,7 @@ async def download_artifact(
 )
 async def read_artifact_text(
     artifact_id: str,
+    max_bytes: int | None = Query(default=None, ge=1),
     current_user: dict = Depends(require_user),
 ) -> PlainTextResponse:
     artifact, path = _resolve_artifact(artifact_id)
@@ -266,18 +270,119 @@ async def read_artifact_text(
             detail="Artifact is not a text document",
         )
 
-    if path.stat().st_size > 5 * 1024 * 1024:
+    file_size = path.stat().st_size
+    max_preview_bytes = int(os.getenv("CRAWLLER_MAX_ARTIFACT_PREVIEW_MB", "500")) * 1024 * 1024
+    if file_size > max_preview_bytes and max_bytes is None:
         raise HTTPException(
             status_code=413,
-            detail="Artifact is too large for inline preview",
+            detail=f"Artifact is too large for inline preview (exceeds {max_preview_bytes // (1024 * 1024)}MB)",
+        )
+
+    if max_bytes is not None and file_size > max_bytes:
+        with path.open("rb") as f:
+            content_bytes = f.read(max_bytes)
+        return PlainTextResponse(
+            content_bytes.decode("utf-8", errors="replace"),
+            headers={
+                "X-Artifact-Truncated": "true",
+                "X-Artifact-Total-Bytes": str(file_size),
+            },
         )
 
     return PlainTextResponse(
         path.read_text(
             encoding="utf-8",
             errors="replace",
-        )
+        ),
+        headers={
+            "X-Artifact-Truncated": "false",
+            "X-Artifact-Total-Bytes": str(file_size),
+        },
     )
+
+
+@app.get("/api/scans/{scan_id}/metrics")
+async def get_metrics(scan_id: str, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    metrics = db.get_scan_metrics(scan_id)
+    return metrics or {}
+
+@app.get("/api/scans/{scan_id}/assets")
+async def get_assets(scan_id: str, limit: int = 50, offset: int = 0, q: str = "", current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_assets_paginated(scan_id, limit, offset, q)
+
+@app.get("/api/scans/{scan_id}/services")
+async def get_services(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_services_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/technologies")
+async def get_technologies(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_technologies_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/endpoints")
+async def get_endpoints(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_endpoints_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/cve-findings")
+async def get_cve_findings(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_cve_findings_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/findings")
+async def get_findings(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_findings_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/relationships")
+async def get_relationships(scan_id: str, limit: int = 50, offset: int = 0, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    return db.get_relationships_paginated(scan_id, limit, offset)
+
+@app.get("/api/scans/{scan_id}/reports/{report_type}")
+async def get_report(scan_id: str, report_type: str, current_user: dict = Depends(require_user)):
+    scan = db.get_scan_owner(scan_id)
+    if not scan or (scan.get("user_id") != current_user["id"] and current_user["role"] != "ADMIN"):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    sections = db.get_report_sections(scan_id, "combined_intelligence" if report_type == "combined" else report_type)
+    if sections and len(sections) > 0:
+        return sections
+    report_name_map = {
+        "combined": "combined_vapt_intelligence_report.md",
+        "technology": "technology_enrichment_report.md",
+        "normalization": "asset_normalization_report.md",
+        "cve": "cve_report.md",
+    }
+    target_name = report_name_map.get(report_type, f"{report_type}.md")
+    artifacts = db.get_artifacts(scan_id, "report")
+    art = next((a for a in artifacts if a["name"] == target_name or target_name in a["name"]), None)
+    if not art and artifacts:
+        art = artifacts[0]
+    if art:
+        art_obj, path = _resolve_artifact(art["id"])
+        if path and path.exists():
+            content = path.read_text(encoding="utf-8", errors="replace")
+            return [{"section_index": 0, "header": art["name"], "level": 1, "content": content}]
+    return []
 
 
 @app.websocket("/ws/scans/{scan_id}")

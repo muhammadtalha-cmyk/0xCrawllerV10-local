@@ -1,3 +1,4 @@
+import subprocess
 import logging
 import mimetypes
 from pathlib import Path
@@ -17,6 +18,7 @@ REPORT_NAMES = {
     "final_report.md",
     "asset_normalization_report.md",
     "technology_enrichment_report.md",
+    "cve_report.md",
     "combined_vapt_intelligence_report.md",
 }
 
@@ -36,6 +38,8 @@ def infer_step(path: Path) -> str | None:
         return "normalization"
     if "technology_enrichment_v9_2" in parts:
         return "technology"
+    if "cve_detection" in parts:
+        return "cve"
     if path.name == "combined_vapt_intelligence_report.md":
         return "report"
     return "recon"
@@ -46,6 +50,16 @@ def index_run_artifacts(db: Database, project_root: Path, scan_id: str, run_dir:
     run_dir = run_dir.resolve()
     if not run_dir.is_dir() or project_root not in run_dir.parents:
         return 0
+
+    try:
+        subprocess.run(
+            ["docker", "run", "--rm", "-v", f"{str(run_dir)}:/output", "alpine", "sh", "-c", "chmod -R a+rX /output 2>/dev/null || true"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=30,
+        )
+    except Exception:
+        pass
 
     candidates: list[Path] = []
     root_names = {
@@ -58,7 +72,7 @@ def index_run_artifacts(db: Database, project_root: Path, scan_id: str, run_dir:
         if candidate.is_file():
             candidates.append(candidate)
 
-    for folder_name in ("normalization_v9", "technology_enrichment_v9_2"):
+    for folder_name in ("normalization_v9", "technology_enrichment_v9_2", "cve_detection"):
         folder = run_dir / folder_name
         if folder.is_dir():
             candidates.extend(

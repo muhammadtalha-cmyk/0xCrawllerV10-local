@@ -63,6 +63,7 @@ def check_required_files() -> None:
         "smart_subdomain_pipeline_v8_modular.py",
         "vapt_asset_normalizer_v9.py",
         "vapt_technology_enricher_v9_2.py",
+        "vapt_cve_detector.py",
         "vapt_combined_report_v10.py",
     ]
     missing = [name for name in required if not (PROJECT_ROOT / name).is_file()]
@@ -104,8 +105,12 @@ def main() -> None:
         help="Skip passive Shodan enrichment (no SHODAN_API_KEY / .env required).",
     )
     parser.add_argument(
+        "--run-dir",
+        help="Explicit run directory. If set, this replaces --latest-root for stages 2-4 and passes down.",
+    )
+    parser.add_argument(
         "--stage",
-        choices=["recon", "normalization", "technology", "report"],
+        choices=["recon", "normalization", "technology", "cve", "report"],
         default=None,
         help="Run only one stage instead of the full chain (used by the web orchestrator).",
     )
@@ -118,11 +123,17 @@ def main() -> None:
     target = args.target
     recon_root = args.recon_root
     only_stage = args.stage
+    explicit_run_dir = getattr(args, "run_dir", None)
 
     # ---- Stage 1: Recon ----
     recon_args = [
-        py, "smart_subdomain_pipeline_v8_modular.py",
+        py, "-u", "smart_subdomain_pipeline_v8_modular.py",
         "--target", target,
+    ]
+    if explicit_run_dir:
+        recon_args.extend(["--run-dir", explicit_run_dir])
+        
+    recon_args.extend([
         "--authorized",
         "--max",
         "--workers", "auto",
@@ -166,7 +177,7 @@ def main() -> None:
         "--nmap-host-timeout", "5m",
         "--screenshot-limit", "50",
         "--screenshot-timeout", "1800",
-    ]
+    ])
     if not args.skip_shodan:
         recon_args += [
             "--shodan-passive",
@@ -183,31 +194,38 @@ def main() -> None:
             "--shodan-cache-ttl-hours", "24",
         ]
     if only_stage in (None, "recon"):
-        run_stage("1/4 Recon (V8.5.1)", recon_args, allowed_exit_codes={0, 3})
+        run_stage("1/5 Recon (V8.5.1)", recon_args, allowed_exit_codes={0, 3})
         if only_stage == "recon":
             return
 
     # ---- Stage 2: Normalization ----
     normalize_args = [
-        py, "vapt_asset_normalizer_v9.py",
+        py, "-u", "vapt_asset_normalizer_v9.py",
         "--target", target,
-        "--latest-root", recon_root,
-        "--overwrite",
     ]
+    if explicit_run_dir:
+        normalize_args.extend(["--run-dir", explicit_run_dir])
+    else:
+        normalize_args.extend(["--latest-root", recon_root, "--overwrite"])
+
     if only_stage in (None, "normalization"):
-        run_stage("2/4 Asset Normalization (V9)", normalize_args, allowed_exit_codes={0})
+        run_stage("2/5 Asset Normalization (V9)", normalize_args, allowed_exit_codes={0})
         if only_stage == "normalization":
             return
 
     # ---- Stage 3: Technology intelligence ----
     tech_args = [
-        py, "vapt_technology_enricher_v9_2.py",
+        py, "-u", "vapt_technology_enricher_v9_2.py",
         "--target", target,
-        "--latest-root", recon_root,
         "--normalize-if-missing",
         "--authorized",
         "--max",
-        "--overwrite",
+    ]
+    if explicit_run_dir:
+        tech_args.extend(["--run-dir", explicit_run_dir])
+    else:
+        tech_args.extend(["--latest-root", recon_root, "--overwrite"])
+    tech_args.extend([
         "--workers", "5",
         "--http-workers", "8",
         "--js-workers", "10",
@@ -219,21 +237,39 @@ def main() -> None:
         "--wappalyzer-next-page-timeout", "25",
         "--request-timeout", "10",
         "--lane-timeout", "1800",
-    ]
+    ])
     if only_stage in (None, "technology"):
-        run_stage("3/4 Technology Intelligence (V9.2, incl. nuclei)", tech_args, allowed_exit_codes={0})
+        run_stage("3/5 Technology Intelligence (V9.2, incl. nuclei)", tech_args, allowed_exit_codes={0})
         if only_stage == "technology":
             return
 
-    # ---- Stage 4: Combined report ----
-    report_args = [
-        py, "vapt_combined_report_v10.py",
+    # ---- Stage 4: CVE intelligence ----
+    cve_args = [
+        py, "-u", "vapt_cve_detector.py",
         "--target", target,
-        "--latest-root", recon_root,
-        "--overwrite",
     ]
+    if explicit_run_dir:
+        cve_args.extend(["--run-dir", explicit_run_dir])
+    else:
+        cve_args.extend(["--latest-root", recon_root, "--overwrite"])
+
+    if only_stage in (None, "cve"):
+        run_stage("4/5 CVE Intelligence (V1.0)", cve_args, allowed_exit_codes={0})
+        if only_stage == "cve":
+            return
+
+    # ---- Stage 5: Combined report ----
+    report_args = [
+        py, "-u", "vapt_combined_report_v10.py",
+        "--target", target,
+    ]
+    if explicit_run_dir:
+        report_args.extend(["--run-dir", explicit_run_dir])
+    else:
+        report_args.extend(["--latest-root", recon_root, "--overwrite"])
+
     if only_stage in (None, "report"):
-        run_stage("4/4 Combined VAPT Report (V10)", report_args, allowed_exit_codes={0})
+        run_stage("5/5 Combined VAPT Report (V10)", report_args, allowed_exit_codes={0})
         if only_stage == "report":
             return
 

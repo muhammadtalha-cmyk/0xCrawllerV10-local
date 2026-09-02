@@ -12,7 +12,8 @@ STEP_DEFINITIONS = (
     ("recon", "Reconnaissance", 1),
     ("normalization", "Asset normalization", 2),
     ("technology", "Technology intelligence", 3),
-    ("report", "Combined report", 4),
+    ("cve", "CVE detection", 4),
+    ("report", "Combined report", 5),
 )
 
 
@@ -692,6 +693,15 @@ class Database:
         if not updates:
             return
 
+        if self.is_postgres:
+            clean_updates = []
+            for key, value in updates:
+                if key == "cancel_requested":
+                    clean_updates.append((key, bool(value)))
+                else:
+                    clean_updates.append((key, value))
+            updates = clean_updates
+
         assignments = ", ".join(
             f"{key} = {'%s' if self.is_postgres else '?'}"
             for key, _ in updates
@@ -1030,3 +1040,115 @@ class Database:
         )
 
         return str(existing["id"]) if existing else artifact_id
+
+    def get_assets_paginated(self, scan_id: str, limit: int, offset: int, host_filter: str = "") -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        params = [scan_id]
+        where_clause = f"WHERE scan_id = {placeholder}"
+        if host_filter:
+            where_clause += f" AND hostname ILIKE {placeholder}"
+            params.append(f"%{host_filter}%")
+        
+        count_sql = f"SELECT COUNT(*) as total FROM assets {where_clause}"
+        total = self.query_one(count_sql, params)["total"]
+
+        data_sql = f"SELECT * FROM assets {where_clause} ORDER BY hostname LIMIT {placeholder} OFFSET {placeholder}"
+        params.extend([limit, offset])
+        data = self.query_all(data_sql, params)
+        return {"total": total, "items": data}
+
+    def get_services_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM ports WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT p.*, a.hostname, a.ip_address 
+            FROM ports p
+            LEFT JOIN assets a ON p.asset_id = a.id
+            WHERE p.scan_id = {placeholder}
+            ORDER BY a.hostname, p.port
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_technologies_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM technologies WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT t.*, a.hostname 
+            FROM technologies t
+            LEFT JOIN assets a ON t.asset_id = a.id
+            WHERE t.scan_id = {placeholder}
+            ORDER BY t.name, a.hostname
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_endpoints_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM endpoints WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT e.*, a.hostname 
+            FROM endpoints e
+            LEFT JOIN assets a ON e.asset_id = a.id
+            WHERE e.scan_id = {placeholder}
+            ORDER BY e.url
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_findings_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM findings WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT f.*, a.hostname 
+            FROM findings f
+            LEFT JOIN assets a ON f.asset_id = a.id
+            WHERE f.scan_id = {placeholder}
+            ORDER BY f.severity DESC, f.finding_type
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_relationships_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM relationships WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT r.*, a_src.hostname as source_hostname, a_tgt.hostname as target_hostname
+            FROM relationships r
+            LEFT JOIN assets a_src ON r.source_asset_id = a_src.id
+            LEFT JOIN assets a_tgt ON r.target_asset_id = a_tgt.id
+            WHERE r.scan_id = {placeholder}
+            ORDER BY r.id
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_cve_findings_paginated(self, scan_id: str, limit: int, offset: int) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        total = self.query_one(f"SELECT COUNT(*) as total FROM cve_findings WHERE scan_id = {placeholder}", (scan_id,))["total"]
+        data_sql = f"""
+            SELECT cv.*, a.hostname
+            FROM cve_findings cv
+            LEFT JOIN assets a ON cv.asset_id = a.id
+            WHERE cv.scan_id = {placeholder}
+            ORDER BY cv.cvss_score DESC NULLS LAST, cv.severity
+            LIMIT {placeholder} OFFSET {placeholder}
+        """
+        data = self.query_all(data_sql, (scan_id, limit, offset))
+        return {"total": total, "items": data}
+
+    def get_scan_metrics(self, scan_id: str) -> dict:
+        placeholder = "%s" if self.is_postgres else "?"
+        return self.query_one(f"SELECT * FROM scan_metrics WHERE scan_id = {placeholder}", (scan_id,))
+
+    def get_report_sections(self, scan_id: str, report_type: str) -> list[dict]:
+        placeholder = "%s" if self.is_postgres else "?"
+        return self.query_all(
+            f"SELECT * FROM report_sections WHERE scan_id = {placeholder} AND report_type = {placeholder} ORDER BY section_index",
+            (scan_id, report_type)
+        )

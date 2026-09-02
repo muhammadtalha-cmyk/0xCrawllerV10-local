@@ -47,7 +47,7 @@ export function ReportDashboard({ scan, artifacts, onOpenArtifact }: { scan: Sca
     { key: "overview", label: "Security overview", icon: <RadarIcon /> },
     { key: "attack-surface", label: "Attack surface", icon: <DatabaseIcon />, count: data?.metrics.totalAssets ?? undefined },
     { key: "technology", label: "Technology", icon: <FingerprintIcon />, count: data?.metrics.technologies ?? undefined },
-    { key: "vulnerabilities", label: "Vulnerabilities", icon: <ShieldAlertIcon />, count: data?.findings.length ?? undefined },
+    { key: "vulnerabilities", label: "Vulnerabilities", icon: <ShieldAlertIcon />, count: (data?.severityCounts.critical || 0) + (data?.severityCounts.high || 0) + (data?.severityCounts.medium || 0) + (data?.severityCounts.low || 0) + (data?.severityCounts.info || 0) },
     { key: "screenshots", label: "Screenshots", icon: <ImageIcon />, count: screenshots.length },
     { key: "technical", label: "Technical report", icon: <FileIcon /> },
   ];
@@ -71,7 +71,7 @@ export function ReportDashboard({ scan, artifacts, onOpenArtifact }: { scan: Sca
         {tab === "technology" && <TechnologyView data={data} />}
         {tab === "vulnerabilities" && <VulnerabilityView data={data} />}
         {tab === "screenshots" && <ScreenshotView screenshots={screenshots} data={data} onOpenArtifact={onOpenArtifact} />}
-        {tab === "technical" && <TechnicalEvidenceView reportArtifact={data.combinedReportArtifact} artifacts={artifacts} onOpenArtifact={onOpenArtifact} />}
+        {tab === "technical" && <TechnicalEvidenceView scan={scan} reportArtifact={data.combinedReportArtifact} artifacts={artifacts} onOpenArtifact={onOpenArtifact} />}
       </div>
     </div>
   );

@@ -82,29 +82,10 @@ export function DashboardAnalytics({ scans }: { scans: Scan[] }) {
         const results = await Promise.all(
           sample.map(async (scan) => {
             try {
-              const artifacts = await api.getArtifacts(scan.id);
-              const findingsArtifact = artifacts.find(
-                (artifact) =>
-                  artifact.name.toLowerCase() === "vulnerability_findings.json"
-              );
-
-              if (!findingsArtifact) {
-                return { scan, findings: [] as Finding[] };
-              }
-
-              const text = await api.artifactText(findingsArtifact.id);
-
-              let payload: unknown = null;
-              try {
-                payload = JSON.parse(text);
-              } catch {
-                payload = null;
-              }
-
-              const findings = (payload ? extractFindings(payload) : null) || [];
-              return { scan, findings };
+              const metrics = await api.getMetrics(scan.id);
+              return { scan, metrics };
             } catch {
-              return { scan, findings: [] };
+              return { scan, metrics: null };
             }
           })
         );
@@ -114,12 +95,17 @@ export function DashboardAnalytics({ scans }: { scans: Scan[] }) {
         const totals: Record<Severity, number> = { ...EMPTY_SEVERITIES };
         const perScan: ScanFindingsSample[] = [];
 
-        for (const { scan, findings } of results) {
-          const counts = computeSeverityCounts(findings);
-          (Object.keys(totals) as Severity[]).forEach((key) => {
-            totals[key] += counts[key];
-          });
-          perScan.push({ scan, count: findings.length });
+        for (const { scan, metrics } of results) {
+          if (!metrics) continue;
+          
+          totals.critical += metrics.severity_critical || 0;
+          totals.high += metrics.severity_high || 0;
+          totals.medium += metrics.severity_medium || 0;
+          totals.low += metrics.severity_low || 0;
+          totals.info += metrics.severity_info || 0;
+          
+          const scanTotal = (metrics.severity_critical || 0) + (metrics.severity_high || 0) + (metrics.severity_medium || 0) + (metrics.severity_low || 0) + (metrics.severity_info || 0);
+          perScan.push({ scan, count: scanTotal });
         }
 
         setSeverityTotals(totals);

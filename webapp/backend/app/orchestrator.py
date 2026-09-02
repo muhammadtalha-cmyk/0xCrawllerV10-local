@@ -50,6 +50,7 @@ PIPELINE: tuple[PipelineStep, ...] = (
     PipelineStep("recon", frozenset({0, 3})),
     PipelineStep("normalization", frozenset({0})),
     PipelineStep("technology", frozenset({0})),
+    PipelineStep("cve", frozenset({0})),
     PipelineStep("report", frozenset({0})),
 )
 
@@ -84,7 +85,7 @@ class Orchestrator:
             self._tasks[scan_id] = asyncio.create_task(self._run(scan_id), name=f"scan-{scan_id}")
 
     async def cancel(self, scan_id: str) -> None:
-        self.db.update_scan(scan_id, cancel_requested=1)
+        self.db.update_scan(scan_id, cancel_requested=True)
         process = self._processes.get(scan_id)
         if process and process.returncode is None:
             if os.name == "nt":
@@ -122,7 +123,7 @@ class Orchestrator:
                     progress=100,
                     completed_at=utc_now(),
                 )
-                self.db.append_log(scan_id, None, "success", "All four modules completed successfully.")
+                self.db.append_log(scan_id, None, "success", "All pipeline modules completed successfully.")
                 await self._publish_snapshot(scan_id, "scan.completed")
             except asyncio.CancelledError:
                 current = self.db.get_scan(scan_id)
@@ -187,7 +188,8 @@ class Orchestrator:
     async def _run_step(
         self, scan_id: str, target: str, step: PipelineStep, index: int
     ) -> None:
-        base_progress = index * 25
+        step_weight = 100 // len(PIPELINE)
+        base_progress = index * step_weight
         self.db.update_scan(
             scan_id, current_step=step.key, progress=base_progress, status="running"
         )
@@ -231,7 +233,8 @@ class Orchestrator:
             exit_code=exit_code,
             message=message,
         )
-        self.db.update_scan(scan_id, progress=(index + 1) * 25)
+        step_weight = 100 // len(PIPELINE)
+        self.db.update_scan(scan_id, progress=(index + 1) * step_weight)
         self.db.append_log(scan_id, step.key, "success", f"{step.key} module completed.")
         await self._publish_snapshot(scan_id, "step.completed")
 
@@ -286,7 +289,8 @@ class Orchestrator:
                 self.db.update_step(scan_id, step.key, message=f"Running {tool}")
             estimated = min(90, 5 + line_count // 20)
             self.db.update_step(scan_id, step.key, progress=estimated)
-            self.db.update_scan(scan_id, progress=min(index * 25 + 22, index * 25 + estimated // 4))
+            step_weight = 100 // len(PIPELINE)
+            self.db.update_scan(scan_id, progress=min(index * step_weight + (step_weight - 3), index * step_weight + estimated // len(PIPELINE)))
             await self.broker.publish(
                 scan_id,
                 {
@@ -316,13 +320,15 @@ class Orchestrator:
             "recon": ["Subfinder discovery", "Amass discovery", "HTTPX probing", "Katana crawling", "Nmap reconciliation", "Screenshots collected"],
             "normalization": ["Merging discovered assets", "Removing duplicates", "Writing canonical inventory"],
             "technology": ["Collecting HTTP evidence", "Running WhatWeb", "Running Wappalyzer", "Running Nuclei", "Reconciling fingerprints"],
+            "cve": ["Extracting versioned inventory", "Searching NVD database", "Correlating CVSS severities", "Generating CVE intelligence report"],
             "report": ["Loading module outputs", "Generating combined VAPT report"],
         }[step.key]
+        step_weight = 100 // len(PIPELINE)
         for position, message in enumerate(messages, start=1):
             await asyncio.sleep(0.18)
             progress = int(position / len(messages) * 90)
             self.db.update_step(scan_id, step.key, progress=progress, message=message)
-            self.db.update_scan(scan_id, progress=index * 25 + progress // 4)
+            self.db.update_scan(scan_id, progress=index * step_weight + progress // len(PIPELINE))
             log_id = self.db.append_log(scan_id, step.key, "info", message)
             await self.broker.publish(
                 scan_id,
