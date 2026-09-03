@@ -2,6 +2,9 @@ import type {
   Artifact,
   Scan,
   ScanLog,
+  SecurityModule,
+  ModuleJob,
+  ModuleRunResponse,
 } from "./types";
 
 export const API_URL = (
@@ -123,6 +126,28 @@ export const api = {
 
   getReportSections: (scanId: string, reportType: string) =>
     request<any[]>(`/api/scans/${scanId}/reports/${reportType}`),
+
+  // ------------------------------------------------------------------
+  // SECURITY MODULES
+  // ------------------------------------------------------------------
+
+  getModules: () =>
+    request<SecurityModule[]>("/api/modules"),
+
+  runModule: (moduleName: string, target: string) =>
+    request<ModuleRunResponse>(`/api/modules/${moduleName}/run`, {
+      method: "POST",
+      body: JSON.stringify({ target }),
+    }),
+
+  listModuleJobs: (limit = 50, offset = 0) =>
+    request<ModuleJob[]>(`/api/modules/jobs?limit=${limit}&offset=${offset}`),
+
+  getModuleJob: (jobId: string) =>
+    request<ModuleJob>(`/api/modules/jobs/${jobId}`),
+
+  getModuleJobResults: (jobId: string) =>
+    request<any>(`/api/modules/jobs/${jobId}/results`),
 };
 
 export function scanSocketUrl(scanId: string): string {

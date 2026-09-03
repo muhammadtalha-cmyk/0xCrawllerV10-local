@@ -309,6 +309,38 @@ class Database:
                     """
                 )
 
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS module_jobs (
+                        id TEXT PRIMARY KEY,
+                        user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+                        module_type TEXT NOT NULL,
+                        target TEXT NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'queued',
+                        progress INTEGER NOT NULL DEFAULT 0,
+                        started_at TEXT NOT NULL,
+                        completed_at TEXT,
+                        error_message TEXT,
+                        result_location TEXT,
+                        created_at TEXT NOT NULL
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE INDEX IF NOT EXISTS idx_module_jobs_user_id
+                    ON module_jobs(user_id)
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE INDEX IF NOT EXISTS idx_module_jobs_status
+                    ON module_jobs(status)
+                    """
+                )
+
                 connection.commit()
 
             return
@@ -388,6 +420,26 @@ class Database:
                     created_at TEXT NOT NULL,
                     UNIQUE(scan_id, relative_path)
                 );
+
+                CREATE TABLE IF NOT EXISTS module_jobs (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+                    module_type TEXT NOT NULL,
+                    target TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'queued',
+                    progress INTEGER NOT NULL DEFAULT 0,
+                    started_at TEXT NOT NULL,
+                    completed_at TEXT,
+                    error_message TEXT,
+                    result_location TEXT,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_module_jobs_user_id
+                ON module_jobs(user_id);
+
+                CREATE INDEX IF NOT EXISTS idx_module_jobs_status
+                ON module_jobs(status);
 
                 CREATE INDEX IF NOT EXISTS idx_artifacts_scan_id
                 ON artifacts(scan_id, kind);
@@ -1151,4 +1203,76 @@ class Database:
         return self.query_all(
             f"SELECT * FROM report_sections WHERE scan_id = {placeholder} AND report_type = {placeholder} ORDER BY section_index",
             (scan_id, report_type)
+        )
+
+    # ------------------------------------------------------------------
+    # SECURITY MODULE JOBS
+    # ------------------------------------------------------------------
+
+    def create_module_job(
+        self,
+        job_id: str,
+        module_type: str,
+        target: str,
+        user_id: str | None = None,
+    ) -> dict[str, Any]:
+        now = utc_now()
+        placeholder = "%s" if self.is_postgres else "?"
+        self.execute(
+            f"""
+            INSERT INTO module_jobs (
+                id, user_id, module_type, target, status, progress, started_at, created_at
+            )
+            VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
+            """,
+            (job_id, user_id, module_type, target, "queued", 0, now, now),
+        )
+        return self.get_module_job(job_id)
+
+    def get_module_job(self, job_id: str) -> dict[str, Any] | None:
+        placeholder = "%s" if self.is_postgres else "?"
+        return self.query_one(
+            f"SELECT * FROM module_jobs WHERE id = {placeholder}",
+            (job_id,),
+        )
+
+    def update_module_job(self, job_id: str, **updates: Any) -> dict[str, Any] | None:
+        if not updates:
+            return self.get_module_job(job_id)
+
+        allowed_fields = {
+            "status", "progress", "started_at", "completed_at", "error_message", "result_location"
+        }
+        filtered_updates = [(k, v) for k, v in updates.items() if k in allowed_fields]
+        if not filtered_updates:
+            return self.get_module_job(job_id)
+
+        placeholder = "%s" if self.is_postgres else "?"
+        set_clauses = [f"{k} = {placeholder}" for k, _ in filtered_updates]
+        values = [v for _, v in filtered_updates]
+        values.append(job_id)
+
+        self.execute(
+            f"UPDATE module_jobs SET {', '.join(set_clauses)} WHERE id = {placeholder}",
+            tuple(values),
+        )
+        return self.get_module_job(job_id)
+
+    def list_module_jobs(
+        self,
+        user_id: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        placeholder = "%s" if self.is_postgres else "?"
+        params: list[Any] = []
+        where_clause = ""
+        if user_id:
+            where_clause = f"WHERE user_id = {placeholder}"
+            params.append(user_id)
+
+        params.extend([limit, offset])
+        return self.query_all(
+            f"SELECT * FROM module_jobs {where_clause} ORDER BY started_at DESC LIMIT {placeholder} OFFSET {placeholder}",
+            tuple(params),
         )

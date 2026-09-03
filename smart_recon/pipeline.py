@@ -1188,6 +1188,10 @@ def run_pipeline(args: Namespace) -> int:
         naabu_rejected_records = read_jsonl(run_dir / "naabu_rejected_records.jsonl")
         # Preserve raw tool output separately and make the compatibility JSONL
         # contain only normalized valid candidate records.
+        try:
+            naabu_output.unlink(missing_ok=True)
+        except Exception:
+            pass
         write_jsonl(naabu_output, naabu_records)
 
         open_ports_by_host = group_open_ports(naabu_records)

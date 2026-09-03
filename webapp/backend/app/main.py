@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import (
+    BackgroundTasks,
     Depends,
     FastAPI,
     Header,
@@ -27,17 +28,23 @@ from .database import Database
 from .events import EventBroker
 from .orchestrator import Orchestrator
 from .auth import require_user, require_admin, auth_router, SECRET_KEY, ALGORITHM
+from .modules import list_modules, get_module, ModuleExecutionRunner
 import jwt
 
 
 db = Database(settings.database_path, settings.database_url)
 broker = EventBroker()
 orchestrator = Orchestrator(settings, db, broker)
+module_runner = ModuleExecutionRunner(db)
 
 
 class ScanCreate(BaseModel):
     target: str = Field(min_length=3, max_length=253)
     authorized: bool
+
+
+class RunModuleRequest(BaseModel):
+    target: str = Field(min_length=3, max_length=253)
 
 
 async def require_api_key(
@@ -465,3 +472,133 @@ async def scan_socket(
         pass
     finally:
         await broker.unsubscribe(scan_id, queue)
+
+
+# ------------------------------------------------------------------
+# SECURITY MODULES API
+# ------------------------------------------------------------------
+
+@app.get("/api/modules")
+async def get_modules_endpoint(current_user: dict = Depends(require_user)):
+    """Returns available security modules."""
+    return list_modules()
+
+
+@app.post("/api/modules/{module_name}/run")
+async def run_module_endpoint(
+    module_name: str,
+    payload: RunModuleRequest,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(require_user),
+):
+    """Launches an independent security module execution on the target domain."""
+    mod = get_module(module_name)
+    if not mod:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Module '{module_name}' not found. Available modules: {[m['id'] for m in list_modules()]}",
+        )
+
+    clean_target = (
+        payload.target.strip().lower()
+        .replace("https://", "")
+        .replace("http://", "")
+        .split("/")[0]
+        .split(":")[0]
+        .rstrip(".")
+    )
+
+    if not clean_target:
+        raise HTTPException(status_code=400, detail="Invalid target domain")
+
+    import uuid
+    job_id = str(uuid.uuid4())
+
+    job = db.create_module_job(
+        job_id=job_id,
+        module_type=mod.id,
+        target=clean_target,
+        user_id=current_user.get("id"),
+    )
+
+    # Launch execution in background task
+    background_tasks.add_task(
+        module_runner.run_job,
+        job_id=job_id,
+        module_name=mod.id,
+        target=clean_target,
+        user_id=current_user.get("id"),
+    )
+
+    return {
+        "job_id": job_id,
+        "module_type": mod.id,
+        "target": clean_target,
+        "status": "queued",
+    }
+
+
+@app.get("/api/modules/jobs")
+async def list_module_jobs_endpoint(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: dict = Depends(require_user),
+):
+    """List recent security module jobs."""
+    user_id = None if current_user.get("role") == "ADMIN" else current_user.get("id")
+    return db.list_module_jobs(user_id=user_id, limit=limit, offset=offset)
+
+
+@app.get("/api/modules/jobs/{job_id}")
+async def get_module_job_endpoint(
+    job_id: str,
+    current_user: dict = Depends(require_user),
+):
+    """Get the status and progress of a security module job."""
+    job = db.get_module_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    if job.get("user_id") and job["user_id"] != current_user["id"] and current_user.get("role") != "ADMIN":
+        raise HTTPException(status_code=403, detail="Not authorized to view this job")
+
+    return job
+
+
+@app.get("/api/modules/jobs/{job_id}/results")
+async def get_module_job_results_endpoint(
+    job_id: str,
+    current_user: dict = Depends(require_user),
+):
+    """Get the output results of a security module job."""
+    job = db.get_module_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    if job.get("user_id") and job["user_id"] != current_user["id"] and current_user.get("role") != "ADMIN":
+        raise HTTPException(status_code=403, detail="Not authorized to view this job")
+
+    if job["status"] == "running":
+        return {
+            "status": "running",
+            "progress": job.get("progress", 0),
+            "message": "Job is still executing...",
+        }
+
+    if job["status"] == "failed":
+        return {
+            "status": "failed",
+            "error": job.get("error_message", "Unknown error"),
+        }
+
+    result_location = job.get("result_location")
+    if not result_location or not os.path.isfile(result_location):
+        raise HTTPException(status_code=404, detail="Result file not found on disk")
+
+    import json
+    try:
+        with open(result_location, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read result file: {e}")
+

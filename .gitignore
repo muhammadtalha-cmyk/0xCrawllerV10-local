@@ -97,3 +97,4 @@ temp/
 
 # TypeScript build cache
 *.tsbuildinfo
+module_runs/
