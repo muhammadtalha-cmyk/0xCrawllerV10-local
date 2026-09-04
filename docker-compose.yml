@@ -1,0 +1,138 @@
+services:
+
+  # ─────────────────────────────────────────────
+  # PostgreSQL Database
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:16
+    container_name: crawller-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-recon}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-reconpass}
+      POSTGRES_DB:       ${POSTGRES_DB:-recondb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - crawller_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-recon} -d ${POSTGRES_DB:-recondb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  # FastAPI Backend
+  # ─────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: webapp/backend/Dockerfile
+    container_name: crawller-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL:              "postgresql://${POSTGRES_USER:-recon}:${POSTGRES_PASSWORD:-reconpass}@postgres:5432/${POSTGRES_DB:-recondb}"
+      CRAWLLER_JWT_SECRET:       ${CRAWLLER_JWT_SECRET:-changeme_generate_with_openssl_rand_hex_32}
+      CRAWLLER_FRONTEND_ORIGINS: ${CRAWLLER_FRONTEND_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      CRAWLLER_API_KEY:          ${CRAWLLER_API_KEY:-}
+      CRAWLLER_PROJECT_ROOT:     ${PWD}
+      CRAWLLER_RECON_ROOT:       ${PWD}/recon_runs
+      SHODAN_API_KEY:            ${SHODAN_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ${PWD}:${PWD}
+    working_dir: ${PWD}/webapp/backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ─────────────────────────────────────────────
+  # Persistent Scan Worker
+  # ─────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: webapp/worker/Dockerfile
+    container_name: crawller-worker
+    restart: unless-stopped
+    environment:
+      DATABASE_URL:          "postgresql://${POSTGRES_USER:-recon}:${POSTGRES_PASSWORD:-reconpass}@postgres:5432/${POSTGRES_DB:-recondb}"
+      CRAWLLER_JWT_SECRET:   ${CRAWLLER_JWT_SECRET:-changeme_generate_with_openssl_rand_hex_32}
+      CRAWLLER_BACKEND_URL:  http://backend:8000
+      CRAWLLER_API_KEY:      ${CRAWLLER_API_KEY:-}
+      CRAWLLER_PROJECT_ROOT: ${PWD}
+      CRAWLLER_RECON_ROOT:   ${PWD}/recon_runs
+      SHODAN_API_KEY:        ${SHODAN_API_KEY:-}
+      PYTHONUNBUFFERED:      "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    volumes:
+      # Docker-in-Docker: give worker access to host Docker socket
+      # so it can spawn tool containers (subfinder, amass, httpx, etc.)
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Bind-mount the entire project at the SAME path as the host.
+      # This is required because run_pipeline.py passes host paths
+      # like "recon_runs/target-20240901-123456" to docker run -v,
+      # and the host Docker daemon resolves those paths on the host FS.
+      - ${PWD}:${PWD}
+    working_dir: ${PWD}/webapp/backend
+
+  # ─────────────────────────────────────────────
+  # Next.js Frontend
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: webapp/frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_API_KEY: ${NEXT_PUBLIC_API_KEY:-}
+    container_name: crawller-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_started
+
+  # ─────────────────────────────────────────────
+  # Optional / Build-only Tool Images
+  # (Invoked by pipeline via docker run, not daemons)
+  # ─────────────────────────────────────────────
+  whatweb:
+    build:
+      context: tools/whatweb
+      args:
+        WHATWEB_VERSION: v0.6.4
+    image: 0xcrawller/whatweb:0.6.4
+    profiles: ["tools"]
+
+  retirejs:
+    build:
+      context: tools/retirejs
+      args:
+        RETIREJS_VERSION: 5.4.3
+    image: 0xcrawller/retirejs:5.4.3
+    profiles: ["tools"]
+
+  wappalyzer-next:
+    build:
+      context: tools/wappalyzer-next
+      args:
+        WAPPALYZER_NEXT_VERSION: v2.0.0
+    image: 0xcrawller/wappalyzer-next:2.0.0
+    profiles: ["tools"]
+
+volumes:
+  crawller_pgdata:
+  crawller_nuclei_templates:

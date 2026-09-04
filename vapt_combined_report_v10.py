@@ -138,7 +138,8 @@ def code(value: Any) -> str:
     text = md(value)
     if text == "—":
         return text
-    return f"`{text.replace('`', "'")}`"
+    clean_text = text.replace("`", "'")
+    return f"`{clean_text}`"
 
 
 def count_nested(mapping: dict[str, Any], *keys: str, default: int = 0) -> int:

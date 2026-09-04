@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+dist
+build
+.venv
+venv
+env
+
+# Node
+node_modules
+.npm
+
+# Next.js build output (frontend has its own context)
+webapp/frontend/.next
+
+# Scan output (large, bind-mounted at runtime)
+recon_runs
+reports_to_send
+
+# Secrets / local env files
+.env
+*.env.local
+
+# OS / IDE
+.DS_Store
+*.swp
+*.swo
+.idea
+.vscode
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.pytest_cache
+tests/__pycache__
+htmlcov
+.coverage

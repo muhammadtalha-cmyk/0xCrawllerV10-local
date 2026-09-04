@@ -84,6 +84,7 @@ def run_nuclei(
     command = [
         "docker", "run", "--rm",
         "-v", f"{_mount_path(lane_dir)}:/work",
+        "-v", "crawller_nuclei_templates:/root/nuclei-templates",
         image,
         "-l", "/work/targets.txt",
         "-jsonl",
@@ -100,6 +101,8 @@ def run_nuclei(
         command += ["-severity", ",".join(severity)]
     if templates:
         command += ["-t", templates]
+    else:
+        command += ["-t", "/root/nuclei-templates"]
 
     execution = run_command(command, timeout=timeout)
     raw_jsonl = result_file.read_text(encoding="utf-8", errors="replace") if result_file.exists() else ""
