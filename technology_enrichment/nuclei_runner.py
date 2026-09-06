@@ -86,6 +86,7 @@ def run_nuclei(
         "-v", f"{_mount_path(lane_dir)}:/work",
         "-v", "crawller_nuclei_templates:/root/nuclei-templates",
         image,
+        "-duc",
         "-l", "/work/targets.txt",
         "-jsonl",
         "-o", "/work/nuclei.jsonl",
@@ -110,11 +111,15 @@ def run_nuclei(
         raw_jsonl = execution["stdout"]
     findings = parse_nuclei_findings(raw_jsonl)
 
-    # Empty output with a clean exit is a valid "no findings" outcome, not
-    # a failure — same principle applied throughout the other lanes below.
-    status = "COMPLETE" if (execution.get("ok") or (not execution.get("timed_out") and execution.get("return_code") in (0, 1))) else (
-        "PARTIAL" if findings else "FAILED"
-    )
+    # Clean exit (return_code == 0) is COMPLETE even with 0 findings (a clean scan).
+    # Non-zero return code (e.g. exit code 1 on fatal error) or timeout is FAILED,
+    # or PARTIAL if findings were parsed before the failure occurred.
+    if execution.get("ok"):
+        status = "COMPLETE"
+    elif findings:
+        status = "PARTIAL"
+    else:
+        status = "FAILED"
     return {
         "status": status,
         "tool": "nuclei",

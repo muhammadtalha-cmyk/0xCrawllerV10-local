@@ -64,9 +64,13 @@ docker compose up -d --build
 
 # ── 3b. Verify scanner tool images ───────────────────────────
 echo ""
-echo "[+] Verifying scanner tool images..."
+echo "[+] Verifying scanner tool images and Nuclei templates..."
+TECH_READY=true
 if [ -f "./build-v9.2-tech-images.sh" ]; then
-    ./build-v9.2-tech-images.sh || true
+    if ! ./build-v9.2-tech-images.sh; then
+        echo "[ERROR] Scanner tool images or Nuclei templates initialization failed."
+        TECH_READY=false
+    fi
 fi
 
 # ── 4. Health verification ───────────────────────────────────
@@ -92,7 +96,7 @@ echo ""
 docker compose ps
 echo ""
 
-if [ "$BACKEND_HEALTHY" = true ]; then
+if [ "$BACKEND_HEALTHY" = true ] && [ "$TECH_READY" = true ]; then
     echo "╔══════════════════════════════════════════════════╗"
     echo "║  0xCrawllerV10 stack is READY!                   ║"
     echo "║                                                  ║"
@@ -101,8 +105,14 @@ if [ "$BACKEND_HEALTHY" = true ]; then
     echo "║  API Docs:      http://localhost:8000/docs       ║"
     echo "╚══════════════════════════════════════════════════╝"
 else
-    echo "[WARN] Backend health endpoint not yet responding after ${MAX_WAIT}s."
-    echo "       Services may still be starting up. Run ./STATUS_SYSTEM.sh to inspect."
+    echo "[WARN] System startup completed with warnings/failures:"
+    if [ "$BACKEND_HEALTHY" != true ]; then
+        echo "       - Backend health endpoint not responding after ${MAX_WAIT}s."
+    fi
+    if [ "$TECH_READY" != true ]; then
+        echo "       - Technology scanner tool images or Nuclei templates failed to initialize."
+    fi
+    echo "       Run ./STATUS_SYSTEM.sh or ./build-v9.2-tech-images.sh to inspect."
 fi
 
 echo ""

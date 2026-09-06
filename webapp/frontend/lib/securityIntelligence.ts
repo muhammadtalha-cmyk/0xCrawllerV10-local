@@ -101,8 +101,8 @@ export async function loadSecurityIntelligence(artifacts: Artifact[], scan: Scan
     screenshots,
     liveAssets,
     deadAssets,
-    highRiskAssets: 0,
-    suspiciousEndpoints: normCounts?.suspicious_endpoints ?? 0,
+    highRiskAssets: metricsData?.high_risk_assets ?? normCounts?.high_risk_assets ?? null,
+    suspiciousEndpoints: metricsData?.suspicious_endpoints ?? normCounts?.suspicious_endpoints ?? null,
   };
 
   const severityCounts: Record<Severity, number> = {

@@ -6,7 +6,7 @@ from pathlib import Path
 from technology_enrichment.config import EnrichmentConfig, auto_workers
 from technology_enrichment.engine import _build_revalidation_queue, enrich_run
 from technology_enrichment.http_evidence import extract_http_technologies
-from technology_enrichment.nuclei_runner import parse_nuclei_findings
+from technology_enrichment.nuclei_runner import parse_nuclei_findings, run_nuclei
 from technology_enrichment.reconcile import parse_existing_technology, reconcile_technology
 from technology_enrichment.retirejs_runner import parse_retirejs
 from technology_enrichment.target_planner import build_plan
@@ -303,3 +303,49 @@ def test_v92_config_defaults_and_overrides_nuclei_settings():
     assert custom_config.nuclei_workers == 25  # capped at ceiling
     assert custom_config.nuclei_severity == ("high", "critical")
     assert custom_config.nuclei_templates == "/opt/templates"
+
+
+def test_run_nuclei_clean_exit_zero_findings_is_complete(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(
+        "technology_enrichment.nuclei_runner.run_command",
+        lambda cmd, **kwargs: {"ok": True, "return_code": 0, "stdout": "", "stderr": "", "timed_out": False, "seconds": 1.0},
+    )
+    targets = [{"url": "https://example.com"}]
+    res = run_nuclei(targets, output_dir=tmp_path, image="nuclei", severity=None, templates=None, workers=1, request_timeout=5.0, timeout=10)
+    assert res["status"] == "COMPLETE"
+    assert res["findings"] == []
+
+
+def test_run_nuclei_exit_code_1_zero_findings_is_failed(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(
+        "technology_enrichment.nuclei_runner.run_command",
+        lambda cmd, **kwargs: {"ok": False, "return_code": 1, "stdout": "", "stderr": "no valid templates were found", "timed_out": False, "seconds": 1.0},
+    )
+    targets = [{"url": "https://example.com"}]
+    res = run_nuclei(targets, output_dir=tmp_path, image="nuclei", severity=None, templates=None, workers=1, request_timeout=5.0, timeout=10)
+    assert res["status"] == "FAILED"
+    assert res["findings"] == []
+
+
+def test_run_nuclei_exit_code_1_with_findings_is_partial(monkeypatch, tmp_path: Path):
+    line = json.dumps({"template-id": "cve-123", "info": {"name": "Test", "severity": "high"}, "host": "https://example.com", "type": "http"})
+    monkeypatch.setattr(
+        "technology_enrichment.nuclei_runner.run_command",
+        lambda cmd, **kwargs: {"ok": False, "return_code": 1, "stdout": line + "\n", "stderr": "fatal error later", "timed_out": False, "seconds": 1.0},
+    )
+    targets = [{"url": "https://example.com"}]
+    res = run_nuclei(targets, output_dir=tmp_path, image="nuclei", severity=None, templates=None, workers=1, request_timeout=5.0, timeout=10)
+    assert res["status"] == "PARTIAL"
+    assert len(res["findings"]) == 1
+
+
+def test_run_nuclei_timed_out_is_failed(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(
+        "technology_enrichment.nuclei_runner.run_command",
+        lambda cmd, **kwargs: {"ok": False, "return_code": None, "stdout": "", "stderr": "command timed out", "timed_out": True, "seconds": 10.0},
+    )
+    targets = [{"url": "https://example.com"}]
+    res = run_nuclei(targets, output_dir=tmp_path, image="nuclei", severity=None, templates=None, workers=1, request_timeout=5.0, timeout=10)
+    assert res["status"] == "FAILED"
+    assert res["findings"] == []
+

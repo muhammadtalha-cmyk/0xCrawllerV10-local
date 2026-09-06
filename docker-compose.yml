@@ -15,6 +15,7 @@ services:
       - "5432:5432"
     volumes:
       - crawller_pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-recon} -d ${POSTGRES_DB:-recondb}"]
       interval: 10s
@@ -129,7 +130,7 @@ services:
     build:
       context: tools/wappalyzer-next
       args:
-        WAPPALYZER_NEXT_VERSION: v2.0.0
+        WAPPALYZER_NEXT_VERSION: 2.0.0
     image: 0xcrawller/wappalyzer-next:2.0.0
     profiles: ["tools"]
 

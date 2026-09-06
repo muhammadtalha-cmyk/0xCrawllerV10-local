@@ -207,3 +207,19 @@ CREATE TABLE IF NOT EXISTS scan_metrics (
     severity_info INTEGER DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS cve_findings (
+    id SERIAL PRIMARY KEY,
+    scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+    asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+    cve_id TEXT NOT NULL,
+    product TEXT,
+    version TEXT,
+    cvss_score NUMERIC,
+    severity TEXT,
+    description TEXT,
+    source TEXT,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_cve_findings_scan_id ON cve_findings(scan_id);
+CREATE INDEX IF NOT EXISTS idx_cve_findings_asset_id ON cve_findings(asset_id);

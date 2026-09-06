@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { Scan } from "@/lib/types";
 import type { IntelligenceData } from "@/lib/securityIntelligence";
 import { formatDate } from "@/lib/format";
@@ -22,28 +22,6 @@ function MetricCard({ label, value, icon, tone }: { label: string; value: number
       <span className="intel-metric-icon">{icon}</span>
       <div><small>{label}</small><strong>{display(value)}</strong></div>
     </article>
-  );
-}
-
-function SecurityScore({ data }: { data: IntelligenceData }) {
-  const score = 85; // Placeholder for now, could be calculated in backend
-  const degrees = Math.round((score / 100) * 270);
-  return (
-    <div className={`security-score risk-low`}>
-      <div className="score-copy">
-        <small>Security posture score</small>
-        <h2>Evidence-based posture</h2>
-        <p>Derived only from indexed vulnerability findings in this scan.</p>
-      </div>
-      <div className="score-ring" style={{ "--score-deg": `${degrees}deg` } as CSSProperties}>
-        <div><strong>{score}</strong><span>/100</span></div>
-      </div>
-      <div className="risk-copy">
-        <small>Risk status</small>
-        <strong>Risk evaluated</strong>
-        <span>Based on latest scan metrics</span>
-      </div>
-    </div>
   );
 }
 
@@ -121,8 +99,6 @@ export function SecurityOverview({ data, scan }: { data: IntelligenceData; scan:
         <div><small>Target intelligence</small><h2>{scan.target}</h2></div>
         <div className="intel-last-scan"><span>Last scan</span><strong>{formatDate(scan.completed_at || scan.started_at)}</strong></div>
       </div>
-
-      <SecurityScore data={data} />
 
       <div className="intel-metric-grid">
         <MetricCard label="Total assets" value={data.metrics.totalAssets} icon={<DatabaseIcon />} tone="violet" />

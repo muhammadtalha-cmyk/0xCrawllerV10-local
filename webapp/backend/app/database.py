@@ -309,6 +309,76 @@ class Database:
                     """
                 )
 
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS relationships (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+                        source_asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        target_asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        relationship_type TEXT NOT NULL,
+                        metadata JSONB DEFAULT '{}'::jsonb
+                    )
+                    """
+                )
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_relationships_scan_id ON relationships(scan_id)")
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_relationships_source ON relationships(source_asset_id)")
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_relationships_target ON relationships(target_asset_id)")
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS report_sections (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+                        report_type TEXT NOT NULL,
+                        section_index INTEGER NOT NULL,
+                        header TEXT,
+                        level INTEGER,
+                        content TEXT NOT NULL
+                    )
+                    """
+                )
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_report_sections_scan_id ON report_sections(scan_id, report_type, section_index)")
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS scan_metrics (
+                        scan_id TEXT PRIMARY KEY REFERENCES scans(id) ON DELETE CASCADE,
+                        total_assets INTEGER DEFAULT 0,
+                        total_services INTEGER DEFAULT 0,
+                        total_endpoints INTEGER DEFAULT 0,
+                        total_findings INTEGER DEFAULT 0,
+                        total_technologies INTEGER DEFAULT 0,
+                        severity_critical INTEGER DEFAULT 0,
+                        severity_high INTEGER DEFAULT 0,
+                        severity_medium INTEGER DEFAULT 0,
+                        severity_low INTEGER DEFAULT 0,
+                        severity_info INTEGER DEFAULT 0,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                    """
+                )
+
+                connection.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS cve_findings (
+                        id SERIAL PRIMARY KEY,
+                        scan_id TEXT NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
+                        asset_id INTEGER REFERENCES assets(id) ON DELETE CASCADE,
+                        cve_id TEXT NOT NULL,
+                        product TEXT,
+                        version TEXT,
+                        cvss_score NUMERIC,
+                        severity TEXT,
+                        description TEXT,
+                        source TEXT,
+                        created_at TEXT NOT NULL
+                    )
+                    """
+                )
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_cve_findings_scan_id ON cve_findings(scan_id)")
+                connection.execute("CREATE INDEX IF NOT EXISTS idx_cve_findings_asset_id ON cve_findings(asset_id)")
+
                 connection.commit()
 
             return

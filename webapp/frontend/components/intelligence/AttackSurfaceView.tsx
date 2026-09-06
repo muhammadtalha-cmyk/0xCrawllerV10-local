@@ -5,14 +5,71 @@ import { ImageIcon, RadarIcon, ShieldAlertIcon } from "../Icons";
 import { TechnologyLogo } from "./TechnologyLogo";
 import { useEffect, useState } from "react";
 
+// Best-effort field lookup: backend relationship/endpoint shapes aren't
+// strongly typed on the frontend, so we probe the common key spellings
+// instead of assuming one and silently rendering nothing (or worse, guessing).
+function pick(obj: any, keys: string[]): string | null {
+  for (const key of keys) {
+    if (obj && obj[key] !== undefined && obj[key] !== null) return String(obj[key]);
+  }
+  return null;
+}
+
+function relationshipEndpoints(rel: any): { source: string | null; target: string | null } {
+  return {
+    source: pick(rel, ["source", "source_hostname", "from", "from_hostname", "src", "src_hostname", "parent", "parent_hostname"]),
+    target: pick(rel, ["target", "target_hostname", "to", "to_hostname", "dst", "dst_hostname", "child", "child_hostname"]),
+  };
+}
+
 function AssetGraph({ scanId, target }: { scanId: string; target: string }) {
-  const [nodes, setNodes] = useState<any[]>([]);
+  const [assets, setAssets] = useState<any[]>([]);
+  const [relationships, setRelationships] = useState<any[]>([]);
+  const [endpoints, setEndpoints] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    api.getAssets(scanId, 8, 0).then((res) => {
-      setNodes(res.items.filter((asset: any) => asset.hostname !== target).slice(0, 8));
+    let cancelled = false;
+    Promise.all([
+      api.getAssets(scanId, 50, 0),
+      api.getRelationships(scanId, 200, 0),
+      api.getEndpoints(scanId, 200, 0),
+    ])
+      .then(([assetsRes, relRes, endpointsRes]) => {
+        if (cancelled) return;
+        setAssets(assetsRes.items || []);
+        setRelationships(relRes.items || []);
+        setEndpoints(endpointsRes.items || []);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAssets([]);
+          setRelationships([]);
+          setEndpoints([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [scanId]);
+
+  const nodes = assets.filter((asset: any) => asset.hostname !== target).slice(0, 8);
+  const nodeByHostname = new Map(nodes.map((n: any) => [n.hostname, n]));
+  const nodeIndex = new Map(nodes.map((n: any, i: number) => [n.hostname, i]));
+
+  // Only draw an edge when both ends of a real relationship resolve to
+  // hostnames we're actually rendering as nodes (or the root target itself).
+  const edges = relationships
+    .map(relationshipEndpoints)
+    .filter(({ source, target: t }) => {
+      if (!source || !t) return false;
+      const sourceKnown = source === target || nodeByHostname.has(source);
+      const targetKnown = t === target || nodeByHostname.has(t);
+      return sourceKnown && targetKnown && (source === target || t === target);
     });
-  }, [scanId, target]);
 
   const radius = 38;
 
@@ -21,11 +78,14 @@ function AssetGraph({ scanId, target }: { scanId: string; target: string }) {
       <div className="graph-grid-bg" />
       <div className="graph-rays" />
       <svg className="graph-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {nodes.map((asset, index) => {
+        {edges.map(({ source, target: t }, i) => {
+          const other = source === target ? t! : source!;
+          const index = nodeIndex.get(other);
+          if (index === undefined) return null;
           const angle = (Math.PI * 2 * index) / Math.max(1, nodes.length) - Math.PI / 2;
           const x = 50 + Math.cos(angle) * radius;
           const y = 50 + Math.sin(angle) * 34;
-          return <line key={asset.hostname} x1="50" y1="50" x2={x} y2={y} />;
+          return <line key={`${source}-${t}-${i}`} x1="50" y1="50" x2={x} y2={y} />;
         })}
       </svg>
       <div className="root-asset-node"><span>{target}</span><small>Authorized root</small></div>
@@ -33,6 +93,7 @@ function AssetGraph({ scanId, target }: { scanId: string; target: string }) {
         const angle = (Math.PI * 2 * index) / Math.max(1, nodes.length) - Math.PI / 2;
         const x = 50 + Math.cos(angle) * radius;
         const y = 50 + Math.sin(angle) * 34;
+        const assetEndpointCount = endpoints.filter((ep: any) => pick(ep, ["hostname", "host"]) === asset.hostname).length;
         return (
           <article
             className={`asset-node tone-cyan`}
@@ -40,12 +101,12 @@ function AssetGraph({ scanId, target }: { scanId: string; target: string }) {
             style={{ left: `${x}%`, top: `${y}%` }}
           >
             <div className="asset-node-head"><strong>{asset.hostname}</strong><span><TechnologyLogo name="Asset" /></span></div>
-            <small>{asset.asset_types?.[0] || "Asset"}</small>
-            <p>Live</p>
+            <small>{asset.metadata?.asset_types?.[0] || asset.asset_types?.[0] || asset.asset_type?.split(",")[0] || "Asset"}</small>
+            <p>{assetEndpointCount > 0 ? `${assetEndpointCount} endpoint${assetEndpointCount === 1 ? "" : "s"}` : "No indexed endpoints"}</p>
           </article>
         );
       })}
-      {!nodes.length && <div className="graph-empty">Asset relationships will appear after normalization data is indexed.</div>}
+      {loaded && !nodes.length && <div className="graph-empty">Asset relationships will appear after normalization data is indexed.</div>}
     </section>
   );
 }

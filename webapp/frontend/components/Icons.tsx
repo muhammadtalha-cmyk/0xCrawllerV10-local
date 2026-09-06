@@ -32,3 +32,16 @@ export const UserIcon = (props: SVGProps<SVGSVGElement>) => <IconBase {...props}
 export const LinkIcon = (props: SVGProps<SVGSVGElement>) => <IconBase {...props}><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"/></IconBase>;
 export const ServerIcon = (props: SVGProps<SVGSVGElement>) => <IconBase {...props}><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/></IconBase>;
 export const ActivityIcon = (props: SVGProps<SVGSVGElement>) => <IconBase {...props}><path d="M3 12h4l2-7 4 14 2-7h6"/></IconBase>;
+export const CopyIcon = (props: SVGProps<SVGSVGElement>) => <IconBase {...props}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></IconBase>;
+export const SunIcon = (props: SVGProps<SVGSVGElement>) => (
+  <IconBase {...props}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </IconBase>
+);
+export const MoonIcon = (props: SVGProps<SVGSVGElement>) => (
+  <IconBase {...props}>
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+  </IconBase>
+);
+

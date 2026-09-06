@@ -19,6 +19,7 @@ import {
 } from "@/components/Icons";
 import { ScanCard } from "@/components/ScanCard";
 import { DashboardAnalytics } from "@/components/DashboardAnalytics";
+import { SecurityModules } from "@/components/modules/SecurityModules";
 import type { Scan } from "@/lib/types";
 import { api } from "@/lib/api";
 
@@ -234,6 +235,9 @@ export default function DashboardPage() {
           {submitting ? "Launching pipeline..." : "Run discovery scan"}
         </button>
       </form>
+
+      {/* Standalone Security Modules */}
+      <SecurityModules />
 
       {/* Operational analytics dashboard — real scan + findings data only */}
       {!loading && <DashboardAnalytics scans={scans} />}

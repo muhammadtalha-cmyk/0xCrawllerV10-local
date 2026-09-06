@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 import re
 from datetime import datetime
+from .database import utc_now
 
 logger = logging.getLogger("crawller.ingest")
 
